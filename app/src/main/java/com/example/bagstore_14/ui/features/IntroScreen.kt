@@ -17,6 +17,7 @@ import com.example.bagstore_14.R
 import com.example.bagstore_14.ui.theme.BackgroundMain
 import com.example.bagstore_14.ui.theme.Blue
 import com.example.bagstore_14.ui.theme.MainAppTheme
+import dev.burnoo.cokoin.navigation.getNavController
 
 
 @Preview(showBackground = true)
@@ -37,6 +38,8 @@ fun IntroScreenPreview() {
 
 @Composable
 fun IntroScreen() {
+
+    val navigation = getNavController()
 
     Image(
         modifier = Modifier.fillMaxSize(),

@@ -13,25 +13,32 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.bagstore_14.di.myModules
 import com.example.bagstore_14.ui.features.IntroScreen
 import com.example.bagstore_14.ui.theme.BackgroundMain
 import com.example.bagstore_14.ui.theme.MainAppTheme
 import com.example.bagstore_14.util.KEY_CATEGORY_ARG
 import com.example.bagstore_14.util.KEY_PRODUCT_ARG
 import com.example.bagstore_14.util.MyScreens
+import dev.burnoo.cokoin.Koin
+import dev.burnoo.cokoin.navigation.KoinNavHost
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MainAppTheme {
-                Surface(
-                    color = BackgroundMain,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    BagStoreUi()
+
+            Koin(appDeclaration = {modules(myModules)}) {
+                MainAppTheme {
+                    Surface(
+                        color = BackgroundMain,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        BagStoreUi()
+                    }
                 }
             }
+
         }
     }
 }
@@ -40,7 +47,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun BagStoreUi() {
     val navController = rememberNavController()
-    NavHost(
+   KoinNavHost(
         navController = navController,
         startDestination = MyScreens.IntroScreen.route
     ) {
