@@ -1,0 +1,152 @@
+package com.example.bagstore_14.ui
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.bagstore_14.ui.features.IntroScreen
+import com.example.bagstore_14.ui.theme.BackgroundMain
+import com.example.bagstore_14.ui.theme.MainAppTheme
+import com.example.bagstore_14.util.KEY_CATEGORY_ARG
+import com.example.bagstore_14.util.KEY_PRODUCT_ARG
+import com.example.bagstore_14.util.MyScreens
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            MainAppTheme {
+                Surface(
+                    color = BackgroundMain,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    BagStoreUi()
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun BagStoreUi() {
+    val navController = rememberNavController()
+    NavHost(
+        navController = navController,
+        startDestination = MyScreens.IntroScreen.route
+    ) {
+        composable(MyScreens.MainScreen.route) {
+            MainScreen()
+        }
+
+        composable(
+            route = MyScreens.ProductScreen.route +"/"+ KEY_PRODUCT_ARG,
+        arguments = listOf(navArgument(KEY_PRODUCT_ARG){
+            type= NavType.IntType
+        })
+        ) {
+            ProductScreen(it.arguments!!.getInt(KEY_PRODUCT_ARG,-1))
+        }
+
+        composable(
+            route =MyScreens.CategoryScreen.route +"/"+ KEY_CATEGORY_ARG,
+        arguments = listOf(navArgument(KEY_CATEGORY_ARG){
+            type = NavType.StringType
+        })
+        ) {
+            CategoryScreen(it.arguments!!.getString(KEY_CATEGORY_ARG,"null"))
+        }
+
+        composable(MyScreens.ProfileScreen.route) {
+            ProfileScreen()
+        }
+
+        composable(MyScreens.CartScreen.route) {
+            CartScreen()
+        }
+
+        composable(MyScreens.SignUpScreen.route) {
+            SingUpScreen()
+        }
+
+        composable(MyScreens.SignInScreen.route) {
+            SingInScreen()
+        }
+
+        composable(MyScreens.IntroScreen.route) {
+            IntroScreen()
+        }
+
+        composable(MyScreens.NoInternetScreen.route) {
+            NoInternetScreen()
+        }
+
+
+    }
+
+
+}
+
+@Composable
+fun NoInternetScreen() {
+
+}
+
+
+
+@Composable
+fun SingInScreen() {
+
+}
+
+@Composable
+fun SingUpScreen() {
+
+}
+
+@Composable
+fun CartScreen() {
+
+}
+
+@Composable
+fun ProfileScreen() {
+
+}
+
+@Composable
+fun CategoryScreen(categoryName : String) {
+
+}
+
+@Composable
+fun ProductScreen(productId:Int) {
+
+}
+
+@Composable
+fun MainScreen() {
+
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    MainAppTheme {
+        Surface(
+            color = BackgroundMain ,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            BagStoreUi()
+        }
+    }
+}
