@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.bagstore_14.di.myModules
 import com.example.bagstore_14.ui.features.IntroScreen
+import com.example.bagstore_14.ui.features.SignUp.SingUpScreen
 import com.example.bagstore_14.ui.theme.BackgroundMain
 import com.example.bagstore_14.ui.theme.MainAppTheme
 import com.example.bagstore_14.util.KEY_CATEGORY_ARG
@@ -115,10 +116,7 @@ fun SingInScreen() {
 
 }
 
-@Composable
-fun SingUpScreen() {
 
-}
 
 @Composable
 fun CartScreen() {
