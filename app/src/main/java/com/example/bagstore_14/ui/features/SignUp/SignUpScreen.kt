@@ -1,9 +1,12 @@
 package com.example.bagstore_14.ui.features.SignUp
 
+import android.media.Image
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -14,6 +17,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -105,8 +111,8 @@ fun MainCardView(SignUpEvent:()->Unit){
             )
             MainTextField(name.value,R.drawable.ic_person , "Your Full Name"){name.value = it}
             MainTextField(email.value,R.drawable.ic_email , "Email"){email.value = it}
-            MainTextField(password.value,R.drawable.ic_password , "Password"){password.value = it}
-            MainTextField(confirmPassword.value,R.drawable.ic_password , "Confirm Password"){confirmPassword.value = it}
+            PasswordTextField(password.value,R.drawable.ic_password , "Password"){password.value = it}
+            PasswordTextField(confirmPassword.value,R.drawable.ic_password , "Confirm Password"){confirmPassword.value = it}
 
             Button(onClick = SignUpEvent, modifier = Modifier.padding(top = 28.dp, bottom = 8.dp)) {
                 Text(
@@ -150,6 +156,40 @@ fun MainTextField(
         leadingIcon = { Icon(painterResource(icon),null)}
 
         )
+
+
+}
+
+@Composable
+fun PasswordTextField(edtValue:String, icon:Int, hint:String, onValueChanges:(String) ->Unit){
+
+    val passwordVisible = remember { mutableStateOf(false) }
+
+
+    OutlinedTextField(label = { Text(hint)},
+        value = edtValue,
+        singleLine = true,
+        onValueChange = onValueChanges,
+        placeholder = { Text(hint)},
+        modifier = Modifier
+            .fillMaxWidth(0.9f)
+            .padding(top = 12.dp),
+        shape = Shapes.medium,
+        leadingIcon = { Icon(painterResource(icon),null)},
+        visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        trailingIcon = {
+            
+            val image = if (passwordVisible.value) painterResource(id = R.drawable.ic_invisible) else
+                painterResource(R.drawable.ic_visible)
+
+            Icon(painter = image, contentDescription = null,
+            modifier = Modifier.clickable { passwordVisible.value= !passwordVisible.value })
+            
+        }
+
+
+    )
 
 
 }
