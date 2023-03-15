@@ -1,12 +1,16 @@
 package com.example.bagstore_14.ui.features.SignUp
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -25,19 +29,56 @@ fun SingUpScreenPreview() {
     MainAppTheme {
         Surface(
             color = BackgroundMain ,
-            modifier = Modifier.wrapContentSize()
+            modifier = Modifier.fillMaxSize()
         ) {
-            MainCardView{
-
-            }
+            SingUpScreen()
         }
     }
 }
 
 @Composable
 fun SingUpScreen() {
+     Box {
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.4f)
+            .background(Blue)
+        )
+         Column(
+             modifier = Modifier
+                 .fillMaxWidth()
+                 .fillMaxHeight(0.95f),
+             verticalArrangement = Arrangement.SpaceEvenly,
+             horizontalAlignment = Alignment.CenterHorizontally
+
+         ) {
+
+             IconApp()
+             MainCardView {
+
+             }
+         }
+     }
 
 }
+
+@Composable
+fun IconApp(){
+    Surface(
+      modifier = Modifier
+          .clip(CircleShape)
+          .size(64.dp)
+    ) {
+        Image(
+            modifier = Modifier.padding(14.dp),
+            painter = painterResource(id = R.drawable.ic_icon_app) ,
+            contentDescription =null )
+
+    }
+
+
+}
+
 @Composable
 fun MainCardView(SignUpEvent:()->Unit){
 
