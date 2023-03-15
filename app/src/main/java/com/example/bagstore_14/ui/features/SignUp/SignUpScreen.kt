@@ -37,6 +37,7 @@ import com.example.bagstore_14.util.MyScreens
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
 import com.example.bagstore_14.util.NetworkChecker
+import com.example.bagstore_14.util.VALUE_SUCCESS
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Preview(showBackground = true)
@@ -56,6 +57,7 @@ fun SingUpScreenPreview() {
 fun SingUpScreen() {
     val uiController = rememberSystemUiController()
     SideEffect { uiController.setStatusBarColor(Blue) }
+    val context = LocalContext.current
 
     val navigation = getNavController()
     val viewModel = getNavViewModel<SignUpViewModel>()
@@ -78,7 +80,22 @@ fun SingUpScreen() {
 
              IconApp()
              MainCardView(navigation,viewModel){
-                 viewModel.signUpUser()
+                 viewModel.signUpUser{
+                     if (it == VALUE_SUCCESS){
+                         navigation.navigate(MyScreens.MainScreen.route){
+
+                             popUpTo(MyScreens.IntroScreen.route){
+                                 inclusive= true
+                             }
+
+                         }
+
+                     }else{
+                         Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                     }
+
+
+                 }
 
              }
          }

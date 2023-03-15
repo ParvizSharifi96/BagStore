@@ -10,10 +10,10 @@ interface UserRepository {
     fun loadToken()
 
     fun saveToken(newToken:String)
-    fun getToken():String
+    fun getToken():String?
 
     fun saveUserName(username:String)
-    fun getUserName():String
+    fun getUserName():String?
 
 
 

@@ -37,6 +37,7 @@ import com.example.bagstore_14.util.MyScreens
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
 import com.example.bagstore_14.util.NetworkChecker
+import com.example.bagstore_14.util.VALUE_SUCCESS
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Preview(showBackground = true)
@@ -44,7 +45,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 fun SingInScreenPreview() {
     MainAppTheme {
         Surface(
-            color = BackgroundMain ,
+            color = BackgroundMain,
             modifier = Modifier.fillMaxSize()
         ) {
             SingInScreen()
@@ -56,47 +57,64 @@ fun SingInScreenPreview() {
 fun SingInScreen() {
     val uiController = rememberSystemUiController()
     SideEffect { uiController.setStatusBarColor(Blue) }
-
+    val context = LocalContext.current
     val navigation = getNavController()
     val viewModel = getNavViewModel<SignInViewModel>()
 
 
-     Box {
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.4f)
-            .background(Blue)
+    Box {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.4f)
+                .background(Blue)
         )
-         Column(
-             modifier = Modifier
-                 .fillMaxWidth()
-                 .fillMaxHeight(0.8f),
-             verticalArrangement = Arrangement.SpaceEvenly,
-             horizontalAlignment = Alignment.CenterHorizontally
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.8f),
+            verticalArrangement = Arrangement.SpaceEvenly,
+            horizontalAlignment = Alignment.CenterHorizontally
 
-         ) {
+        ) {
 
-             IconApp()
-             MainCardView(navigation,viewModel){
-                 viewModel.signInUser()
+            IconApp()
+            MainCardView(navigation, viewModel) {
+                viewModel.signInUser {
+                    if (it == VALUE_SUCCESS) {
+                        navigation.navigate(MyScreens.MainScreen.route) {
 
-             }
-         }
-     }
+                            popUpTo(MyScreens.IntroScreen.route) {
+                                inclusive = true
+                            }
+
+                        }
+
+                    } else {
+                        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                    }
+
+
+                }
+
+            }
+        }
+    }
 
 }
 
 @Composable
-fun IconApp(){
+fun IconApp() {
     Surface(
-      modifier = Modifier
-          .clip(CircleShape)
-          .size(64.dp)
+        modifier = Modifier
+            .clip(CircleShape)
+            .size(64.dp)
     ) {
         Image(
             modifier = Modifier.padding(14.dp),
-            painter = painterResource(id = R.drawable.ic_icon_app) ,
-            contentDescription =null )
+            painter = painterResource(id = R.drawable.ic_icon_app),
+            contentDescription = null
+        )
 
     }
 
@@ -104,11 +122,11 @@ fun IconApp(){
 }
 
 @Composable
-fun MainCardView(navigation:NavController, viewModel: SignInViewModel, SignInEvent:()->Unit){
+fun MainCardView(navigation: NavController, viewModel: SignInViewModel, SignInEvent: () -> Unit) {
 
 
     val email = viewModel.email.observeAsState("")
-    val password= viewModel.password.observeAsState("")
+    val password = viewModel.password.observeAsState("")
     val context = LocalContext.current
 
 
@@ -128,28 +146,37 @@ fun MainCardView(navigation:NavController, viewModel: SignInViewModel, SignInEve
                 style = TextStyle(color = Blue, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             )
 
-            MainTextField(email.value,R.drawable.ic_email , "Email"){viewModel.email.value = it}
-            PasswordTextField(password.value,R.drawable.ic_password , "Password"){viewModel.password.value = it}
+            MainTextField(email.value, R.drawable.ic_email, "Email") { viewModel.email.value = it }
+            PasswordTextField(
+                password.value,
+                R.drawable.ic_password,
+                "Password"
+            ) { viewModel.password.value = it }
 
 
-            Button(onClick ={
+            Button(onClick = {
 
 
-                if (email.value.isNotEmpty() && password.value.isNotEmpty() ){
-                            if (Patterns.EMAIL_ADDRESS.matcher(email.value).matches()){
-                                if (NetworkChecker(context).isInternetConnected){
-                                    SignInEvent.invoke()
+                if (email.value.isNotEmpty() && password.value.isNotEmpty()) {
+                    if (Patterns.EMAIL_ADDRESS.matcher(email.value).matches()) {
+                        if (NetworkChecker(context).isInternetConnected) {
+                            SignInEvent.invoke()
 
-                                }else{
-                                    Toast.makeText(context, "Please connect to internet ", Toast.LENGTH_SHORT).show()
-                                }
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Please connect to internet ",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
 
-                            }else{
-                                Toast.makeText(context, "Email format is not true ", Toast.LENGTH_SHORT).show()
-                            }
-                }else{ Toast.makeText(context, "Please write data first", Toast.LENGTH_SHORT).show() }
-
-
+                    } else {
+                        Toast.makeText(context, "Email format is not true ", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                } else {
+                    Toast.makeText(context, "Please write data first", Toast.LENGTH_SHORT).show()
+                }
 
 
             }, modifier = Modifier.padding(top = 28.dp, bottom = 8.dp)) {
@@ -159,21 +186,24 @@ fun MainCardView(navigation:NavController, viewModel: SignInViewModel, SignInEve
                 )
             }
 
-            Row(modifier = Modifier.padding(bottom = 18.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically){
+            Row(
+                modifier = Modifier.padding(bottom = 18.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text("Don't have an account?")
                 Spacer(modifier = Modifier.width(8.dp))
-                TextButton(onClick ={
-                    navigation.navigate(MyScreens.SignUpScreen.route){
+                TextButton(onClick = {
+                    navigation.navigate(MyScreens.SignUpScreen.route) {
 
-                popUpTo(MyScreens.SignInScreen.route){
-                    inclusive = true
-                }
+                        popUpTo(MyScreens.SignInScreen.route) {
+                            inclusive = true
+                        }
 
-                } } ) {
-                    Text("Register here" , color = Blue)
-                    
+                    }
+                }) {
+                    Text("Register here", color = Blue)
+
                 }
             }
         }
@@ -184,53 +214,53 @@ fun MainCardView(navigation:NavController, viewModel: SignInViewModel, SignInEve
 
 @Composable
 fun MainTextField(
-    edtValue:String,
-    icon:Int,
-    hint:String,
-    onValueChanges:(String) ->Unit
-){
-    OutlinedTextField(label = { Text(hint)},
-    value = edtValue,
+    edtValue: String,
+    icon: Int,
+    hint: String,
+    onValueChanges: (String) -> Unit
+) {
+    OutlinedTextField(label = { Text(hint) },
+        value = edtValue,
         singleLine = true,
         onValueChange = onValueChanges,
-        placeholder = { Text(hint)},
+        placeholder = { Text(hint) },
         modifier = Modifier
             .fillMaxWidth(0.9f)
             .padding(top = 12.dp),
         shape = Shapes.medium,
-        leadingIcon = { Icon(painterResource(icon),null)}
+        leadingIcon = { Icon(painterResource(icon), null) }
 
-        )
+    )
 
 
 }
 
 @Composable
-fun PasswordTextField(edtValue:String, icon:Int, hint:String, onValueChanges:(String) ->Unit){
+fun PasswordTextField(edtValue: String, icon: Int, hint: String, onValueChanges: (String) -> Unit) {
 
     val passwordVisible = remember { mutableStateOf(false) }
 
 
-    OutlinedTextField(label = { Text(hint)},
+    OutlinedTextField(label = { Text(hint) },
         value = edtValue,
         singleLine = true,
         onValueChange = onValueChanges,
-        placeholder = { Text(hint)},
+        placeholder = { Text(hint) },
         modifier = Modifier
             .fillMaxWidth(0.9f)
             .padding(top = 12.dp),
         shape = Shapes.medium,
-        leadingIcon = { Icon(painterResource(icon),null)},
+        leadingIcon = { Icon(painterResource(icon), null) },
         visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         trailingIcon = {
-            
+
             val image = if (passwordVisible.value) painterResource(id = R.drawable.ic_visible) else
                 painterResource(R.drawable.ic_invisible)
 
             Icon(painter = image, contentDescription = null,
-            modifier = Modifier.clickable { passwordVisible.value= !passwordVisible.value })
-            
+                modifier = Modifier.clickable { passwordVisible.value = !passwordVisible.value })
+
         }
 
 

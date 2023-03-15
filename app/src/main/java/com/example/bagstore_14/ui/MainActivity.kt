@@ -13,6 +13,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.bagstore_14.di.myModules
+import com.example.bagstore_14.model.repository.TokenInMemory
+import com.example.bagstore_14.model.repository.user.UserRepository
 import com.example.bagstore_14.ui.features.IntroScreen
 import com.example.bagstore_14.ui.features.SignUp.SingUpScreen
 import com.example.bagstore_14.ui.features.signIn.SingInScreen
@@ -22,6 +24,7 @@ import com.example.bagstore_14.util.KEY_CATEGORY_ARG
 import com.example.bagstore_14.util.KEY_PRODUCT_ARG
 import com.example.bagstore_14.util.MyScreens
 import dev.burnoo.cokoin.Koin
+import dev.burnoo.cokoin.get
 import dev.burnoo.cokoin.navigation.KoinNavHost
 import org.koin.android.ext.koin.androidContext
 
@@ -36,11 +39,11 @@ class MainActivity : ComponentActivity() {
 
             }) {
                 MainAppTheme {
-                    Surface(
-                        color = BackgroundMain,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
+                    Surface(color = BackgroundMain, modifier = Modifier.fillMaxSize()) {
+                        val userRepository: UserRepository = get()
+                        userRepository.loadToken()
                         BagStoreUi()
+
                     }
                 }
             }
@@ -53,30 +56,36 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun BagStoreUi() {
     val navController = rememberNavController()
-   KoinNavHost(
+    KoinNavHost(
         navController = navController,
         startDestination = MyScreens.IntroScreen.route
     ) {
         composable(MyScreens.MainScreen.route) {
-            MainScreen()
+
+            if (TokenInMemory.token != null) {
+                MainScreen()
+            } else {
+                IntroScreen()
+            }
+
         }
 
         composable(
-            route = MyScreens.ProductScreen.route +"/"+ KEY_PRODUCT_ARG,
-        arguments = listOf(navArgument(KEY_PRODUCT_ARG){
-            type= NavType.IntType
-        })
+            route = MyScreens.ProductScreen.route + "/" + KEY_PRODUCT_ARG,
+            arguments = listOf(navArgument(KEY_PRODUCT_ARG) {
+                type = NavType.IntType
+            })
         ) {
-            ProductScreen(it.arguments!!.getInt(KEY_PRODUCT_ARG,-1))
+            ProductScreen(it.arguments!!.getInt(KEY_PRODUCT_ARG, -1))
         }
 
         composable(
-            route =MyScreens.CategoryScreen.route +"/"+ KEY_CATEGORY_ARG,
-        arguments = listOf(navArgument(KEY_CATEGORY_ARG){
-            type = NavType.StringType
-        })
+            route = MyScreens.CategoryScreen.route + "/" + KEY_CATEGORY_ARG,
+            arguments = listOf(navArgument(KEY_CATEGORY_ARG) {
+                type = NavType.StringType
+            })
         ) {
-            CategoryScreen(it.arguments!!.getString(KEY_CATEGORY_ARG,"null"))
+            CategoryScreen(it.arguments!!.getString(KEY_CATEGORY_ARG, "null"))
         }
 
         composable(MyScreens.ProfileScreen.route) {
@@ -92,7 +101,7 @@ fun BagStoreUi() {
         }
 
         composable(MyScreens.SignInScreen.route) {
-           SingInScreen()
+            SingInScreen()
         }
 
         composable(MyScreens.IntroScreen.route) {
@@ -108,6 +117,7 @@ fun BagStoreUi() {
 
 
 }
+
 
 @Composable
 fun NoInternetScreen() {
@@ -126,12 +136,12 @@ fun ProfileScreen() {
 }
 
 @Composable
-fun CategoryScreen(categoryName : String) {
+fun CategoryScreen(categoryName: String) {
 
 }
 
 @Composable
-fun ProductScreen(productId:Int) {
+fun ProductScreen(productId: Int) {
 
 }
 
@@ -145,7 +155,7 @@ fun MainScreen() {
 fun DefaultPreview() {
     MainAppTheme {
         Surface(
-            color = BackgroundMain ,
+            color = BackgroundMain,
             modifier = Modifier.fillMaxSize()
         ) {
             BagStoreUi()
