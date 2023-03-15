@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +36,8 @@ import com.example.bagstore_14.ui.theme.Shapes
 import com.example.bagstore_14.util.MyScreens
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
+import com.example.bagstore_14.util.NetworkChecker
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Preview(showBackground = true)
 @Composable
@@ -51,6 +54,8 @@ fun SingInScreenPreview() {
 
 @Composable
 fun SingInScreen() {
+    val uiController = rememberSystemUiController()
+    SideEffect { uiController.setStatusBarColor(Blue) }
 
     val navigation = getNavController()
     val viewModel = getNavViewModel<SignInViewModel>()
@@ -132,7 +137,13 @@ fun MainCardView(navigation:NavController, viewModel: SignInViewModel, SignInEve
 
                 if (email.value.isNotEmpty() && password.value.isNotEmpty() ){
                             if (Patterns.EMAIL_ADDRESS.matcher(email.value).matches()){
-                                SignInEvent.invoke()
+                                if (NetworkChecker(context).isInternetConnected){
+                                    SignInEvent.invoke()
+
+                                }else{
+                                    Toast.makeText(context, "Please connect to internet ", Toast.LENGTH_SHORT).show()
+                                }
+
                             }else{
                                 Toast.makeText(context, "Email format is not true ", Toast.LENGTH_SHORT).show()
                             }

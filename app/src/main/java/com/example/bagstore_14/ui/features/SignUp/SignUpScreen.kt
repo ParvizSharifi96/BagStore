@@ -1,6 +1,5 @@
 package com.example.bagstore_14.ui.features.SignUp
 
-import android.media.Image
 import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -11,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +36,8 @@ import com.example.bagstore_14.ui.theme.Shapes
 import com.example.bagstore_14.util.MyScreens
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
+import com.example.bagstore_14.util.NetworkChecker
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Preview(showBackground = true)
 @Composable
@@ -52,6 +54,8 @@ fun SingUpScreenPreview() {
 
 @Composable
 fun SingUpScreen() {
+    val uiController = rememberSystemUiController()
+    SideEffect { uiController.setStatusBarColor(Blue) }
 
     val navigation = getNavController()
     val viewModel = getNavViewModel<SignUpViewModel>()
@@ -136,7 +140,12 @@ fun MainCardView(navigation:NavController, viewModel: SignUpViewModel ,SignUpEve
                                  if(password.value == confirmPassword.value){
                                      if (password.value.length>=8){
                                          if (Patterns.EMAIL_ADDRESS.matcher(email.value).matches()){
-                                             SignUpEvent.invoke()
+                                             if (NetworkChecker(context).isInternetConnected){
+                                                 SignUpEvent.invoke()
+                                             }else{
+                                                 Toast.makeText(context, "Please connect to internet ", Toast.LENGTH_SHORT).show()
+                                             }
+
                                          }else{
                                              Toast.makeText(context, "Email format is not true ", Toast.LENGTH_SHORT).show()
                                          }

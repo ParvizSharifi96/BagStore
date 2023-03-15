@@ -7,6 +7,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,6 +19,7 @@ import com.example.bagstore_14.ui.theme.BackgroundMain
 import com.example.bagstore_14.ui.theme.Blue
 import com.example.bagstore_14.ui.theme.MainAppTheme
 import com.example.bagstore_14.util.MyScreens
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dev.burnoo.cokoin.navigation.getNavController
 
 
@@ -39,6 +41,8 @@ fun IntroScreenPreview() {
 
 @Composable
 fun IntroScreen() {
+    val uiController = rememberSystemUiController()
+    SideEffect { uiController.setStatusBarColor(Blue) }
 
     val navigation = getNavController()
 
