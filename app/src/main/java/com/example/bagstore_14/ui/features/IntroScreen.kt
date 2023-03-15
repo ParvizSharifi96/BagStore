@@ -17,6 +17,7 @@ import com.example.bagstore_14.R
 import com.example.bagstore_14.ui.theme.BackgroundMain
 import com.example.bagstore_14.ui.theme.Blue
 import com.example.bagstore_14.ui.theme.MainAppTheme
+import com.example.bagstore_14.util.MyScreens
 import dev.burnoo.cokoin.navigation.getNavController
 
 
@@ -57,7 +58,9 @@ fun IntroScreen() {
 
         Button(
             modifier = Modifier.fillMaxWidth(0.7f),
-            onClick = {  }
+            onClick = {
+                navigation.navigate(MyScreens.SignUpScreen.route)
+            }
         ) {
             Text(
                 text = "Sign Up"
@@ -68,7 +71,9 @@ fun IntroScreen() {
         Button(
             modifier = Modifier.fillMaxWidth(0.7f),
             colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-            onClick = { }
+            onClick = {
+                navigation.navigate(MyScreens.SignInScreen.route)
+            }
         ) {
             Text(
                 text = "Sign In" ,

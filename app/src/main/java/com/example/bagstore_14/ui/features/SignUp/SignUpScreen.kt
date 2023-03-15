@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -23,11 +24,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.bagstore_14.R
 import com.example.bagstore_14.ui.theme.BackgroundMain
 import com.example.bagstore_14.ui.theme.Blue
 import com.example.bagstore_14.ui.theme.MainAppTheme
 import com.example.bagstore_14.ui.theme.Shapes
+import com.example.bagstore_14.util.MyScreens
+import dev.burnoo.cokoin.navigation.getNavController
+import dev.burnoo.cokoin.navigation.getNavViewModel
 
 @Preview(showBackground = true)
 @Composable
@@ -44,6 +49,11 @@ fun SingUpScreenPreview() {
 
 @Composable
 fun SingUpScreen() {
+
+    val navigation = getNavController()
+    val viewModel = getNavViewModel<SignUpViewModel>()
+
+
      Box {
         Box(modifier = Modifier
             .fillMaxWidth()
@@ -60,7 +70,8 @@ fun SingUpScreen() {
          ) {
 
              IconApp()
-             MainCardView {
+             MainCardView(navigation,viewModel){
+                 viewModel.signUpUser()
 
              }
          }
@@ -86,12 +97,12 @@ fun IconApp(){
 }
 
 @Composable
-fun MainCardView(SignUpEvent:()->Unit){
+fun MainCardView(navigation:NavController, viewModel: SignUpViewModel ,SignUpEvent:()->Unit){
 
-    val name = remember { mutableStateOf("") }
-    val email = remember { mutableStateOf("") }
-    val password= remember { mutableStateOf("") }
-    val confirmPassword= remember { mutableStateOf("") }
+    val name = viewModel.name.observeAsState("")
+    val email = viewModel.email.observeAsState("")
+    val password= viewModel.password.observeAsState("")
+    val confirmPassword= viewModel.confirmPassword.observeAsState("")
 
 
     Card(
@@ -109,10 +120,10 @@ fun MainCardView(SignUpEvent:()->Unit){
                 text = "Sign Up",
                 style = TextStyle(color = Blue, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             )
-            MainTextField(name.value,R.drawable.ic_person , "Your Full Name"){name.value = it}
-            MainTextField(email.value,R.drawable.ic_email , "Email"){email.value = it}
-            PasswordTextField(password.value,R.drawable.ic_password , "Password"){password.value = it}
-            PasswordTextField(confirmPassword.value,R.drawable.ic_password , "Confirm Password"){confirmPassword.value = it}
+            MainTextField(name.value,R.drawable.ic_person , "Your Full Name"){viewModel.name.value = it}
+            MainTextField(email.value,R.drawable.ic_email , "Email"){viewModel.email.value = it}
+            PasswordTextField(password.value,R.drawable.ic_password , "Password"){viewModel.password.value = it}
+            PasswordTextField(confirmPassword.value,R.drawable.ic_password , "Confirm Password"){viewModel.confirmPassword.value = it}
 
             Button(onClick = SignUpEvent, modifier = Modifier.padding(top = 28.dp, bottom = 8.dp)) {
                 Text(
@@ -126,7 +137,14 @@ fun MainCardView(SignUpEvent:()->Unit){
             verticalAlignment = Alignment.CenterVertically){
                 Text("Already have an account?")
                 Spacer(modifier = Modifier.width(8.dp))
-                TextButton(onClick ={} ) {
+                TextButton(onClick ={
+                    navigation.navigate(MyScreens.SignInScreen.route){
+
+                popUpTo(MyScreens.SignUpScreen.route){
+                    inclusive = true
+                }
+
+                } } ) {
                     Text("Log In" , color = Blue)
                     
                 }
@@ -180,8 +198,8 @@ fun PasswordTextField(edtValue:String, icon:Int, hint:String, onValueChanges:(St
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         trailingIcon = {
             
-            val image = if (passwordVisible.value) painterResource(id = R.drawable.ic_invisible) else
-                painterResource(R.drawable.ic_visible)
+            val image = if (passwordVisible.value) painterResource(id = R.drawable.ic_visible) else
+                painterResource(R.drawable.ic_invisible)
 
             Icon(painter = image, contentDescription = null,
             modifier = Modifier.clickable { passwordVisible.value= !passwordVisible.value })
