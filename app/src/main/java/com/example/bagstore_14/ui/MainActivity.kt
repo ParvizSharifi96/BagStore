@@ -15,6 +15,7 @@ import androidx.navigation.navArgument
 import com.example.bagstore_14.di.myModules
 import com.example.bagstore_14.ui.features.IntroScreen
 import com.example.bagstore_14.ui.features.SignUp.SingUpScreen
+import com.example.bagstore_14.ui.features.signIn.SingInScreen
 import com.example.bagstore_14.ui.theme.BackgroundMain
 import com.example.bagstore_14.ui.theme.MainAppTheme
 import com.example.bagstore_14.util.KEY_CATEGORY_ARG
@@ -86,7 +87,7 @@ fun BagStoreUi() {
         }
 
         composable(MyScreens.SignInScreen.route) {
-            SingInScreen()
+           SingInScreen()
         }
 
         composable(MyScreens.IntroScreen.route) {
@@ -107,14 +108,6 @@ fun BagStoreUi() {
 fun NoInternetScreen() {
 
 }
-
-
-
-@Composable
-fun SingInScreen() {
-
-}
-
 
 
 @Composable
