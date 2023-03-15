@@ -1,6 +1,8 @@
 package com.example.bagstore_14.ui.features.SignUp
 
 import android.media.Image
+import android.util.Patterns
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -104,6 +107,8 @@ fun MainCardView(navigation:NavController, viewModel: SignUpViewModel ,SignUpEve
     val password= viewModel.password.observeAsState("")
     val confirmPassword= viewModel.confirmPassword.observeAsState("")
 
+    val context = LocalContext.current
+
 
     Card(
         modifier = Modifier
@@ -125,7 +130,27 @@ fun MainCardView(navigation:NavController, viewModel: SignUpViewModel ,SignUpEve
             PasswordTextField(password.value,R.drawable.ic_password , "Password"){viewModel.password.value = it}
             PasswordTextField(confirmPassword.value,R.drawable.ic_password , "Confirm Password"){viewModel.confirmPassword.value = it}
 
-            Button(onClick = SignUpEvent, modifier = Modifier.padding(top = 28.dp, bottom = 8.dp)) {
+            Button(onClick = {
+                             if (name.value.isNotEmpty() && email.value.isNotEmpty() && password.value.isNotEmpty() && confirmPassword.value.isNotEmpty() ){
+
+                                 if(password.value == confirmPassword.value){
+                                     if (password.value.length>=8){
+                                         if (Patterns.EMAIL_ADDRESS.matcher(email.value).matches()){
+                                             SignUpEvent.invoke()
+                                         }else{
+                                             Toast.makeText(context, "Email format is not true ", Toast.LENGTH_SHORT).show()
+                                         }
+                                     }else{
+                                         Toast.makeText(context, "Password characters should be more than 8 ! ", Toast.LENGTH_SHORT).show()
+                                     }
+                                 }else{
+                                     Toast.makeText(context, "Passwords are not the same! ", Toast.LENGTH_SHORT).show()
+                                 }
+                             }else{ Toast.makeText(context, "Please write data first", Toast.LENGTH_SHORT).show() }
+
+
+
+            }, modifier = Modifier.padding(top = 28.dp, bottom = 8.dp)) {
                 Text(
                     modifier = Modifier.padding(8.dp),
                     text = "Register Account"

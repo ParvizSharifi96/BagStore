@@ -1,5 +1,7 @@
 package com.example.bagstore_14.ui.features.signIn
 
+import android.util.Patterns
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -96,12 +99,12 @@ fun IconApp(){
 }
 
 @Composable
-fun MainCardView(navigation:NavController, viewModel: SignInViewModel, SignUpEvent:()->Unit){
+fun MainCardView(navigation:NavController, viewModel: SignInViewModel, SignInEvent:()->Unit){
 
 
     val email = viewModel.email.observeAsState("")
     val password= viewModel.password.observeAsState("")
-
+    val context = LocalContext.current
 
 
     Card(
@@ -124,7 +127,21 @@ fun MainCardView(navigation:NavController, viewModel: SignInViewModel, SignUpEve
             PasswordTextField(password.value,R.drawable.ic_password , "Password"){viewModel.password.value = it}
 
 
-            Button(onClick = SignUpEvent, modifier = Modifier.padding(top = 28.dp, bottom = 8.dp)) {
+            Button(onClick ={
+
+
+                if (email.value.isNotEmpty() && password.value.isNotEmpty() ){
+                            if (Patterns.EMAIL_ADDRESS.matcher(email.value).matches()){
+                                SignInEvent.invoke()
+                            }else{
+                                Toast.makeText(context, "Email format is not true ", Toast.LENGTH_SHORT).show()
+                            }
+                }else{ Toast.makeText(context, "Please write data first", Toast.LENGTH_SHORT).show() }
+
+
+
+
+            }, modifier = Modifier.padding(top = 28.dp, bottom = 8.dp)) {
                 Text(
                     modifier = Modifier.padding(8.dp),
                     text = "Log In"
