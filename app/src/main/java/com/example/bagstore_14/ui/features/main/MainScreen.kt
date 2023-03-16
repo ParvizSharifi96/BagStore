@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -228,5 +229,22 @@ fun ProductItem() {
 
 @Composable
 fun BigPictureTablighat() {
+
+
+    Image(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(260.dp)
+            .padding(top = 32.dp, start = 16.dp, end = 16.dp)
+            .clip(Shapes.medium)
+            .clickable { },
+        painter = painterResource(id = R.drawable.img_intro),
+        contentDescription = null,
+        contentScale = ContentScale.Crop
+    )
+
+
+
+
 }
 //------------------------------------------------------------------------------

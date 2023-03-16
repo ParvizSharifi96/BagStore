@@ -1,7 +1,9 @@
 package com.example.bagstore_14.model.net
 
 
+import com.example.bagstore_14.model.data.AdsResponse
 import com.example.bagstore_14.model.data.LoginResponse
+import com.example.bagstore_14.model.data.ProductResponse
 import com.example.bagstore_14.model.repository.TokenInMemory
 import com.example.bagstore_14.util.BASE_URL
 import com.google.gson.JsonObject
@@ -22,6 +24,14 @@ interface ApiService {
 
     @GET("refreshToken")
     fun refreshToken(): retrofit2.Call<LoginResponse>
+
+    @GET("getProducts")
+    suspend fun getAllProducts() : ProductResponse
+
+    @GET("getSliderPics")
+    suspend fun getAllAds() : AdsResponse
+
+
 }
 
 
