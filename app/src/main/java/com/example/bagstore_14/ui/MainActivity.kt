@@ -17,6 +17,7 @@ import com.example.bagstore_14.model.repository.TokenInMemory
 import com.example.bagstore_14.model.repository.user.UserRepository
 import com.example.bagstore_14.ui.features.IntroScreen
 import com.example.bagstore_14.ui.features.SignUp.SingUpScreen
+import com.example.bagstore_14.ui.features.main.MainScreen
 import com.example.bagstore_14.ui.features.signIn.SingInScreen
 import com.example.bagstore_14.ui.theme.BackgroundMain
 import com.example.bagstore_14.ui.theme.MainAppTheme
@@ -62,7 +63,7 @@ fun BagStoreUi() {
     ) {
         composable(MyScreens.MainScreen.route) {
 
-            if (TokenInMemory.token != null) {
+            if (TokenInMemory.token !=null) {
                 MainScreen()
             } else {
                 IntroScreen()
@@ -142,11 +143,6 @@ fun CategoryScreen(categoryName: String) {
 
 @Composable
 fun ProductScreen(productId: Int) {
-
-}
-
-@Composable
-fun MainScreen() {
 
 }
 
