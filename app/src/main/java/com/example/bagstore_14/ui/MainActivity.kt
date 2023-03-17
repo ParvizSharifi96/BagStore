@@ -52,6 +52,18 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    MainAppTheme {
+        Surface(
+            color = BackgroundMain,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            BagStoreUi()
+        }
+    }
+}
 
 
 @Composable
@@ -59,7 +71,7 @@ fun BagStoreUi() {
     val navController = rememberNavController()
     KoinNavHost(
         navController = navController,
-        startDestination = MyScreens.IntroScreen.route
+        startDestination = MyScreens.MainScreen.route
     ) {
         composable(MyScreens.MainScreen.route) {
 
@@ -146,15 +158,3 @@ fun ProductScreen(productId: Int) {
 
 }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    MainAppTheme {
-        Surface(
-            color = BackgroundMain,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            BagStoreUi()
-        }
-    }
-}
