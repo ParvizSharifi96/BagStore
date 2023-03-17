@@ -1,11 +1,12 @@
 package com.example.bagstore_14.ui.features.category
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Card
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,37 +15,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.room.util.getColumnIndex
 import coil.compose.AsyncImage
 import com.example.bagstore_14.model.data.Product
-import com.example.bagstore_14.ui.BagStoreUi
-import com.example.bagstore_14.ui.theme.BackgroundMain
-import com.example.bagstore_14.ui.theme.MainAppTheme
 import com.example.bagstore_14.ui.theme.Shapes
 import com.example.bagstore_14.util.MyScreens
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
 
-//@Preview(showBackground = true)
-//@Composable
-//fun DefaultPreview() {
-//    MainAppTheme {
-//        Surface(
-//            color = BackgroundMain,
-//            modifier = Modifier.fillMaxSize()
-//        ) {
-//            BagStoreUi()
-//        }
-//    }
-//}
-
-
 @Composable
 fun CategoryScreen(categoryName: String) {
     val viewModel = getNavViewModel<CategoryViewModel>()
+    viewModel.loadDataByCategory(categoryName)
+
+
     val navigation = getNavController()
 
     Column(
@@ -106,9 +92,11 @@ fun CategoryItem(data: Product, onProductClicked: (String) -> Unit) {
                 }
 
                 Surface(
-                    modifier = Modifier.padding(bottom = 8.dp , end = 8.dp)
+                    modifier = Modifier
+                        .padding(bottom = 8.dp, end = 8.dp)
                         .align(Alignment.Bottom)
-                        .clip(Shapes.large)
+                        .clip(Shapes.large),
+                    color = Color.Blue
                 ) {
                     Text(
                         modifier = Modifier.padding(4.dp),
@@ -131,10 +119,32 @@ fun CategoryItem(data: Product, onProductClicked: (String) -> Unit) {
 @Composable
 fun CategoryList(data: List<Product>, onProductClicked: (String) -> Unit) {
 
+
+    LazyColumn(modifier = Modifier.fillMaxSize()){
+        items(data.size){
+            CategoryItem(data[it], onProductClicked)
+        }
+    }
+
 }
 
 
 @Composable
 fun CategoryToolbar(categoryName: String) {
+
+    TopAppBar(
+        elevation = 0.dp,
+        backgroundColor = Color.White,
+        modifier = Modifier.fillMaxWidth(),
+        title = {
+         Text(
+             modifier = Modifier.fillMaxWidth(),
+             text = categoryName,
+             textAlign = TextAlign.Center,
+             )
+        }
+    )
+
+
 
 }

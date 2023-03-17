@@ -17,7 +17,7 @@ class CategoryViewModel(
 
 ) : ViewModel() {
     val dataProducts = mutableStateOf<List<Product>>(listOf())
-    fun refreshAllDataFromNet(category  : String) {
+    fun loadDataByCategory(category  : String) {
 
         viewModelScope.launch(){
 
