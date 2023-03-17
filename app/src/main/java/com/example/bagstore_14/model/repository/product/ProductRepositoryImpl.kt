@@ -47,5 +47,9 @@ class ProductRepositoryImpl(
         return listOf()
     }
 
+    override suspend fun getAllProductByCategory(category: String): List<Product> {
+        return productDao.getAllByCategory(category)
+    }
+
 
 }

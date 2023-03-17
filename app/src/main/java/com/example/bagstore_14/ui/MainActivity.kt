@@ -17,6 +17,7 @@ import com.example.bagstore_14.model.repository.TokenInMemory
 import com.example.bagstore_14.model.repository.user.UserRepository
 import com.example.bagstore_14.ui.features.IntroScreen
 import com.example.bagstore_14.ui.features.SignUp.SingUpScreen
+import com.example.bagstore_14.ui.features.category.CategoryScreen
 import com.example.bagstore_14.ui.features.main.MainScreen
 import com.example.bagstore_14.ui.features.signIn.SingInScreen
 import com.example.bagstore_14.ui.theme.BackgroundMain
@@ -134,10 +135,6 @@ fun ProfileScreen() {
 
 }
 
-@Composable
-fun CategoryScreen(categoryName: String) {
-
-}
 
 @Composable
 fun ProductScreen(productId: String) {
