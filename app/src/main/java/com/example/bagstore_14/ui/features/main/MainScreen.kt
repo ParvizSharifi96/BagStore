@@ -32,9 +32,11 @@ import com.example.bagstore_14.model.data.Ads
 import com.example.bagstore_14.model.data.Product
 import com.example.bagstore_14.ui.theme.*
 import com.example.bagstore_14.util.CATEGORY
+import com.example.bagstore_14.util.MyScreens
 import com.example.bagstore_14.util.NetworkChecker
 import com.example.bagstore_14.util.TAGS
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
 import org.koin.core.parameter.parametersOf
 import javax.security.auth.Subject
@@ -60,8 +62,9 @@ fun MainScreen() {
     val context = LocalContext.current
     val uiController = rememberSystemUiController()
     SideEffect { uiController.setStatusBarColor(Color.White) }
-    val viewModel = getNavViewModel<MainViewModel>(
-        parameters = { parametersOf(NetworkChecker(context).isInternetConnected) })
+    val viewModel =
+        getNavViewModel<MainViewModel>(parameters = { parametersOf(NetworkChecker(context).isInternetConnected) })
+    val navigation = getNavController()
 
     Column(
         modifier = Modifier
@@ -80,13 +83,21 @@ fun MainScreen() {
             )
         }
 
-        TopToolbar()
-        CategoryBar(CATEGORY)
+        TopToolbar(
+            onCardClicked = { navigation.navigate(MyScreens.CartScreen.route) },
+            onProfileClicked = { navigation.navigate(MyScreens.ProfileScreen.route) })
+        CategoryBar(CATEGORY) {
+            navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
+        }
 
         val productDataState = viewModel.dataProducts
         val adsDataState = viewModel.dataAds
 
-        ProductSubjectList(TAGS, productDataState.value, adsDataState.value)
+        ProductSubjectList(TAGS, productDataState.value, adsDataState.value) {
+
+            navigation.navigate(MyScreens.ProductScreen.route + "/" + it)
+
+        }
 
 
     }
@@ -95,28 +106,31 @@ fun MainScreen() {
 
 //------------------------------------------------------------------------------
 @Composable
-fun ProductSubjectList(tags: List<String>, products: List<Product>, ads: List<Ads>) {
+fun ProductSubjectList(
+    tags: List<String>,
+    products: List<Product>,
+    ads: List<Ads>,
+    onProductClicked: (String) -> Unit
+) {
     val content = LocalContext.current
-    if (products.isEmpty()){
-        Toast.makeText(content, "Please connect to internet", Toast.LENGTH_SHORT).show()
-    }else{
-    Column {
-        tags.forEachIndexed { it, _ ->
-            val withTagData = products.filter { product -> product.tags == tags[it] }
-            ProductSubject(tags[it], withTagData.shuffled())
-            if (ads.size >= 2)
-            if (it == 1 || it== 2 ){
-                BigPictureTablighat(ads[it - 1])
+    if (products.isNotEmpty()) {
+        Column {
+            tags.forEachIndexed { it, _ ->
+                val withTagData = products.filter { product -> product.tags == tags[it] }
+                ProductSubject(tags[it], withTagData.shuffled(), onProductClicked)
+                if (ads.size >= 2)
+                    if (it == 1 || it == 2) {
+                        BigPictureTablighat(ads[it - 1] , onProductClicked)
+                    }
+            }
         }
-        }
-    }
     }
 
 }
 
 
 @Composable
-fun TopToolbar() {
+fun TopToolbar(onCardClicked: () -> Unit, onProfileClicked: () -> Unit) {
 
     TopAppBar(
         elevation = 0.dp,
@@ -124,11 +138,11 @@ fun TopToolbar() {
         title = { Text(text = "BagStore-14") },
         actions = {
 
-            IconButton(onClick = {}) {
+            IconButton(onClick = { onCardClicked.invoke() }) {
                 Icon(Icons.Default.ShoppingCart, null)
             }
 
-            IconButton(onClick = {}) {
+            IconButton(onClick = { onProfileClicked.invoke() }) {
                 Icon(Icons.Default.Person, null)
             }
 
@@ -140,14 +154,14 @@ fun TopToolbar() {
 //------------------------------------------------------------------------------
 
 @Composable
-fun CategoryBar(categoryList: List<Pair<String, Int>>) {
+fun CategoryBar(categoryList: List<Pair<String, Int>>, onCategoryClicked: (String) -> Unit) {
 
     LazyRow(
         modifier = Modifier.padding(top = 16.dp),
         contentPadding = PaddingValues(end = 16.dp),
     ) {
         items(categoryList.size) {
-            CategoryItem(categoryList[it])
+            CategoryItem(categoryList[it], onCategoryClicked)
         }
     }
 
@@ -155,12 +169,14 @@ fun CategoryBar(categoryList: List<Pair<String, Int>>) {
 }
 
 @Composable
-fun CategoryItem(subject: Pair<String, Int>) {
+fun CategoryItem(subject: Pair<String, Int>, onCategoryClicked: (String) -> Unit) {
 
     Column(
         modifier = Modifier
             .padding(start = 16.dp)
-            .clickable { },
+            .clickable {
+                onCategoryClicked.invoke(subject.first)
+            },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -187,7 +203,7 @@ fun CategoryItem(subject: Pair<String, Int>) {
 //------------------------------------------------------------------------------
 
 @Composable
-fun ProductSubject(subject: String, data: List<Product>) {
+fun ProductSubject(subject: String, data: List<Product> ,   onProductClicked: (String) -> Unit) {
 
     Column(
         modifier = Modifier.padding(top = 32.dp),
@@ -199,7 +215,7 @@ fun ProductSubject(subject: String, data: List<Product>) {
             modifier = Modifier.padding(start = 16.dp),
             style = MaterialTheme.typography.h6
         )
-        ProductBar(data)
+        ProductBar(data ,   onProductClicked)
 
     }
 
@@ -207,24 +223,24 @@ fun ProductSubject(subject: String, data: List<Product>) {
 }
 
 @Composable
-fun ProductBar(data: List<Product>) {
+fun ProductBar(data: List<Product> ,  onProductClicked: (String) -> Unit) {
     LazyRow(
         modifier = Modifier.padding(top = 16.dp),
         contentPadding = PaddingValues(end = 16.dp)
     ) {
         items(data.size) {
-            ProductItem(data[it])
+            ProductItem(data[it] , onProductClicked)
         }
     }
 }
 
 @Composable
-fun ProductItem(product: Product) {
+fun ProductItem(product: Product ,  onProductClicked: (String) -> Unit) {
 
     Card(
         modifier = Modifier
             .padding(start = 16.dp)
-            .clickable { },
+            .clickable { onProductClicked.invoke(product.productId)},
         elevation = 4.dp,
         shape = Shapes.large
     ) {
@@ -269,7 +285,7 @@ fun ProductItem(product: Product) {
 //------------------------------------------------------------------------------
 
 @Composable
-fun BigPictureTablighat(ads :Ads) {
+fun BigPictureTablighat(ads: Ads ,  onProductClicked: (String) -> Unit) {
 
 
     AsyncImage(
@@ -279,7 +295,7 @@ fun BigPictureTablighat(ads :Ads) {
             .height(260.dp)
             .padding(top = 32.dp, start = 16.dp, end = 16.dp)
             .clip(Shapes.medium)
-            .clickable { },
+            .clickable {onProductClicked.invoke(ads.productId) },
         contentDescription = null,
         contentScale = ContentScale.Crop
     )
