@@ -8,6 +8,7 @@ import com.example.bagstore_14.model.data.Ads
 import com.example.bagstore_14.model.data.Product
 import com.example.bagstore_14.model.repository.product.ProductRepository
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -30,8 +31,11 @@ class MainViewModel(
         viewModelScope.launch(){
             if (isInternetConnected)
                 showProgressBar.value = true
+            delay(1500)
+
             val newDataProducts=async { productRepository.getAllProducts(isInternetConnected) }
             val newDataAds = async { productRepository.getAllAds(isInternetConnected)  }
+
 
             updateData(newDataProducts.await() , newDataAds.await())
             showProgressBar.value = false

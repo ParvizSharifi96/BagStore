@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -24,11 +25,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bagstore_14.R
-import com.example.bagstore_14.ui.theme.BackgroundMain
-import com.example.bagstore_14.ui.theme.CardViewBackground
-import com.example.bagstore_14.ui.theme.MainAppTheme
-import com.example.bagstore_14.ui.theme.Shapes
+import com.example.bagstore_14.ui.theme.*
+import com.example.bagstore_14.util.CATEGORY
+import com.example.bagstore_14.util.NetworkChecker
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import dev.burnoo.cokoin.navigation.getNavViewModel
+import org.koin.core.parameter.parametersOf
+import javax.security.auth.Subject
 
 
 @Preview(showBackground = true)
@@ -48,8 +51,11 @@ fun MainScreePreview() {
 
 @Composable
 fun MainScreen() {
+    val context = LocalContext.current
     val uiController = rememberSystemUiController()
     SideEffect { uiController.setStatusBarColor(Color.White) }
+    val viewModel = getNavViewModel<MainViewModel>(
+        parameters = { parametersOf(NetworkChecker(context).isInternetConnected) })
 
     Column(
         modifier = Modifier
@@ -58,17 +64,25 @@ fun MainScreen() {
             .padding(bottom = 16.dp)
 
     ) {
+
+        if (viewModel.showProgressBar.value){
+
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth(),
+                color = Blue
+
+            )
+        }
+
         TopToolbar()
 
-        CategoryBar()
+        CategoryBar(CATEGORY)
 
-        ProductSubject()
-        ProductSubject()
 
-        BigPictureTablighat()
 
-        ProductSubject()
-        ProductSubject()
+
+
+
     }
 
 }
@@ -98,14 +112,14 @@ fun TopToolbar() {
 //------------------------------------------------------------------------------
 
 @Composable
-fun CategoryBar() {
+fun CategoryBar(categoryList: List<Pair<String , Int>>) {
 
     LazyRow(
         modifier = Modifier.padding(top = 16.dp),
         contentPadding = PaddingValues(end = 16.dp),
     ) {
-        items(10) {
-            CategoryItem()
+        items(categoryList.size) {
+            CategoryItem(categoryList[it])
         }
     }
 
@@ -113,7 +127,7 @@ fun CategoryBar() {
 }
 
 @Composable
-fun CategoryItem() {
+fun CategoryItem(subject: Pair<String , Int>) {
 
     Column(
         modifier = Modifier
@@ -129,13 +143,13 @@ fun CategoryItem() {
 
             Image(
                 modifier = Modifier.padding(16.dp),
-                painter = painterResource(id = R.drawable.ic_icon_app),
+                painter = painterResource(id = subject.second),
                 contentDescription = null
             )
 
         }
         Text(
-            text = "Hotels",
+            text = subject.first,
             modifier = Modifier.padding(top = 4.dp),
             style = TextStyle(color = Color.Gray)
         )
