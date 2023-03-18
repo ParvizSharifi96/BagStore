@@ -1,11 +1,13 @@
 package com.example.bagstore_14.util
 
 import com.example.bagstore_14.R
+import com.example.bagstore_14.model.data.Product
 
 const val KEY_PRODUCT_ARG = "productId"
 const val KEY_CATEGORY_ARG = "categoryName"
 const val BASE_URL = "https://dunijet.ir/Projects/DuniBazaar/"
 const val VALUE_SUCCESS = "success"
+val EMPTY_PRODUCT = Product("","","","","","","","","")
 
 val CATEGORY = listOf(
     Pair("Backpack", R.drawable.ic_cat_backpack),
