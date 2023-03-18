@@ -2,9 +2,7 @@ package com.example.bagstore_14.ui.features.SignUp
 
 import android.util.Patterns
 import android.widget.Toast
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -62,6 +60,7 @@ fun SingUpScreen() {
     val navigation = getNavController()
     val viewModel = getNavViewModel<SignUpViewModel>()
 
+    clearInputs(viewModel)
 
      Box {
         Box(modifier = Modifier
@@ -72,7 +71,8 @@ fun SingUpScreen() {
          Column(
              modifier = Modifier
                  .fillMaxWidth()
-                 .fillMaxHeight(0.95f),
+                 .fillMaxHeight(0.95f)
+                 .verticalScroll(rememberScrollState()),
              verticalArrangement = Arrangement.SpaceEvenly,
              horizontalAlignment = Alignment.CenterHorizontally
 
@@ -84,7 +84,7 @@ fun SingUpScreen() {
                      if (it == VALUE_SUCCESS){
                          navigation.navigate(MyScreens.MainScreen.route){
 
-                             popUpTo(MyScreens.IntroScreen.route){
+                             popUpTo(MyScreens.MainScreen.route){
                                  inclusive= true
                              }
 
@@ -213,7 +213,9 @@ fun MainTextField(
     hint:String,
     onValueChanges:(String) ->Unit
 ){
-    OutlinedTextField(label = { Text(hint)},
+    OutlinedTextField(
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        label = { Text(hint)},
     value = edtValue,
         singleLine = true,
         onValueChange = onValueChanges,
@@ -235,7 +237,8 @@ fun PasswordTextField(edtValue:String, icon:Int, hint:String, onValueChanges:(St
     val passwordVisible = remember { mutableStateOf(false) }
 
 
-    OutlinedTextField(label = { Text(hint)},
+    OutlinedTextField(
+        label = { Text(hint)},
         value = edtValue,
         singleLine = true,
         onValueChange = onValueChanges,
@@ -260,5 +263,13 @@ fun PasswordTextField(edtValue:String, icon:Int, hint:String, onValueChanges:(St
 
     )
 
+
+}
+
+fun clearInputs(viewModel: SignUpViewModel){
+    viewModel.email.value =""
+    viewModel.name.value =""
+    viewModel.password.value =""
+    viewModel.confirmPassword.value =""
 
 }

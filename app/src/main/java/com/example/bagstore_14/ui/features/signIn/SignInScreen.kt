@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.bagstore_14.R
+import com.example.bagstore_14.ui.features.SignUp.SignUpViewModel
 import com.example.bagstore_14.ui.theme.BackgroundMain
 import com.example.bagstore_14.ui.theme.Blue
 import com.example.bagstore_14.ui.theme.MainAppTheme
@@ -61,6 +62,7 @@ fun SingInScreen() {
     val navigation = getNavController()
     val viewModel = getNavViewModel<SignInViewModel>()
 
+    clearInputs(viewModel)
 
     Box {
         Box(
@@ -84,7 +86,7 @@ fun SingInScreen() {
                     if (it == VALUE_SUCCESS) {
                         navigation.navigate(MyScreens.MainScreen.route) {
 
-                            popUpTo(MyScreens.IntroScreen.route) {
+                            popUpTo(MyScreens.MainScreen.route) {
                                 inclusive = true
                             }
 
@@ -219,7 +221,9 @@ fun MainTextField(
     hint: String,
     onValueChanges: (String) -> Unit
 ) {
-    OutlinedTextField(label = { Text(hint) },
+    OutlinedTextField(
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        label = { Text(hint) },
         value = edtValue,
         singleLine = true,
         onValueChange = onValueChanges,
@@ -265,6 +269,14 @@ fun PasswordTextField(edtValue: String, icon: Int, hint: String, onValueChanges:
 
 
     )
+
+
+}
+
+
+fun clearInputs(viewModel: SignInViewModel){
+    viewModel.email.value =""
+    viewModel.password.value =""
 
 
 }

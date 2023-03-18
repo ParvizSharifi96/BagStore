@@ -11,6 +11,7 @@ import com.example.bagstore_14.model.repository.user.UserRepositoryImpl
 import com.example.bagstore_14.ui.features.SignUp.SignUpViewModel
 import com.example.bagstore_14.ui.features.category.CategoryViewModel
 import com.example.bagstore_14.ui.features.main.MainViewModel
+import com.example.bagstore_14.ui.features.product.ProductViewModel
 import com.example.bagstore_14.ui.features.signIn.SignInViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -31,6 +32,7 @@ single { Room.databaseBuilder(androidContext() , AppDatabase::class.java , "app_
             )
     }
 
+    viewModel{ProductViewModel()}
     viewModel { SignUpViewModel(get()) }
     viewModel { SignInViewModel(get()) }
     viewModel { (isNetConnected: Boolean) -> MainViewModel(get(), isNetConnected) }
