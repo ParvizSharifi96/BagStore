@@ -1,17 +1,18 @@
 package com.example.bagstore_14.ui.features.product
 
+import android.content.res.Configuration
 import android.widget.AutoCompleteTextView.OnDismissListener
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -20,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -37,6 +39,7 @@ import com.example.bagstore_14.model.data.Product
 import com.example.bagstore_14.ui.features.SignUp.MainTextField
 import com.example.bagstore_14.ui.theme.BackgroundMain
 import com.example.bagstore_14.ui.theme.MainAppTheme
+import com.example.bagstore_14.ui.theme.PriceBackground
 import com.example.bagstore_14.ui.theme.Shapes
 import com.example.bagstore_14.util.MyScreens
 import com.example.bagstore_14.util.NetworkChecker
@@ -530,7 +533,126 @@ fun AddToCart(
     price : String ,
     isAddingProduct : Boolean ,
     OnCartClicked: () -> Unit
-
 ) {
+    val configuration = LocalConfiguration.current
+    val fraction =
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 0.15f else 0.08f
+    Surface(
+        color = Color.White,
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(fraction)
+    ) {
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Button(
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .size(182.dp, 40.dp),
+                onClick = { OnCartClicked.invoke() }
+            ) {
+
+                if (isAddingProduct) {
+                    DotsTyping()
+                } else {
+
+                    Text(
+                        text = "Add Product To Cart",
+                        modifier = Modifier.padding(2.dp),
+                        color = Color.White,
+                        style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                    )
+
+                }
+
+            }
+
+
+            Surface(
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .clip(Shapes.large),
+                color = PriceBackground
+            ) {
+
+                Text(
+                    modifier = Modifier.padding(
+                        start = 8.dp,
+                        end = 8.dp,
+                        top = 6.dp,
+                        bottom = 6.dp
+                    ),
+                    text = price + " Tomans ",
+                    style = TextStyle(fontSize = 14.sp),
+                    fontWeight = FontWeight.Medium
+                )
+
+            }
+
+
+        }
+
+    }
+}
+
+@Composable
+fun DotsTyping() {
+
+    val dotSize = 10.dp
+    val delayUnit = 350
+    val maxOffset = 10f
+
+    @Composable
+    fun Dot(
+        offset: Float
+    ) = Spacer(
+        Modifier
+            .size(dotSize)
+            .offset(y = -offset.dp)
+            .background(
+                color = Color.White,
+                shape = CircleShape
+            )
+            .padding(start = 8.dp, end = 8.dp)
+    )
+
+    val infiniteTransition = rememberInfiniteTransition()
+
+    @Composable
+    fun animateOffsetWithDelay(delay: Int) = infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = delayUnit * 4
+                0f at delay with LinearEasing
+                maxOffset at delay + delayUnit with LinearEasing
+                0f at delay + delayUnit * 2
+            }
+        )
+    )
+
+    val offset1 by animateOffsetWithDelay(0)
+    val offset2 by animateOffsetWithDelay(delayUnit)
+    val offset3 by animateOffsetWithDelay(delayUnit * 2)
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.padding(top = maxOffset.dp)
+    ) {
+        val spaceSize = 2.dp
+
+        Dot(offset1)
+        Spacer(Modifier.width(spaceSize))
+        Dot(offset2)
+        Spacer(Modifier.width(spaceSize))
+        Dot(offset3)
+    }
 
 }
