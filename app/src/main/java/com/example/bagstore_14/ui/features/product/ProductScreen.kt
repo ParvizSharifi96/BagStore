@@ -1,6 +1,8 @@
 package com.example.bagstore_14.ui.features.product
 
+import android.widget.AutoCompleteTextView.OnDismissListener
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -26,10 +28,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.example.bagstore_14.R
 import com.example.bagstore_14.model.data.Comment
 import com.example.bagstore_14.model.data.Product
+import com.example.bagstore_14.ui.features.SignUp.MainTextField
 import com.example.bagstore_14.ui.theme.BackgroundMain
 import com.example.bagstore_14.ui.theme.MainAppTheme
 import com.example.bagstore_14.ui.theme.Shapes
@@ -60,7 +64,7 @@ fun ProductScreen(productId: String) {
 
     val context = LocalContext.current
     val viewModel = getNavViewModel<ProductViewModel>()
-    viewModel.loadData(productId ,  NetworkChecker(context).isInternetConnected)
+    viewModel.loadData(productId, NetworkChecker(context).isInternetConnected)
     val navigation = getNavController()
 
     Box(
@@ -106,7 +110,7 @@ fun ProductScreen(productId: String) {
 }
 
 @Composable
-fun ProductItem(data: Product, comments : List<Comment> ,onCategoryClicked: (String) -> Unit) {
+fun ProductItem(data: Product, comments: List<Comment>, onCategoryClicked: (String) -> Unit) {
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
@@ -117,7 +121,7 @@ fun ProductItem(data: Product, comments : List<Comment> ,onCategoryClicked: (Str
             thickness = 1.dp,
             modifier = Modifier.padding(top = 14.dp, bottom = 14.dp)
         )
-        ProductDetail(data , comments.size.toString())
+        ProductDetail(data, comments.size.toString())
 
         Divider(
             color = Color.LightGray,
@@ -125,20 +129,19 @@ fun ProductItem(data: Product, comments : List<Comment> ,onCategoryClicked: (Str
             modifier = Modifier.padding(top = 14.dp, bottom = 4.dp)
         )
 
-        ProductComments(comments){
+        ProductComments(comments) {
 
 
         }
-
-
 
 
     }
 
 
 }
+
 @Composable
-fun CommentBody(comment : Comment){
+fun CommentBody(comment: Comment) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -160,13 +163,15 @@ fun CommentBody(comment : Comment){
                 text = comment.text,
                 style = TextStyle(fontSize = 13.sp),
 
-            )
+                )
 
         }
+
+
         Divider(
             color = Color.LightGray,
             thickness = 1.dp,
-            modifier = Modifier.padding(top = 14.dp, bottom = 4.dp)
+            modifier = Modifier.padding(top = 2.dp, bottom = 8.dp)
         )
     }
 
@@ -174,68 +179,185 @@ fun CommentBody(comment : Comment){
 
 
 @Composable
-fun ProductComments(comments: List<Comment>, AddNewComment:(String) -> Unit) {
+fun ProductComments(comments: List<Comment>, AddNewComment: (String) -> Unit) {
 
- val showCommentDialog = remember { mutableStateOf(false) }
+    val showCommentDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    if (comments.isNotEmpty()){
-        Row (
+    if (comments.isNotEmpty()) {
+        Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
 
             Text(
-                text ="Comments",
+                text = "Comments",
                 style = TextStyle(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium
-                ))
-            
+                )
+            )
+
             TextButton(onClick = {
 
-                if (NetworkChecker(context).isInternetConnected){
+                if (NetworkChecker(context).isInternetConnected) {
                     showCommentDialog.value = true
-                }else{
+                } else {
 
                     Toast.makeText(context, "Please Connect to internet", Toast.LENGTH_SHORT).show()
 
                 }
             }) {
 
-                Text(text = "Add New Comment"
-                , style = TextStyle(fontSize = 14.sp)
+                Text(
+                    text = "Add New Comment", style = TextStyle(fontSize = 14.sp)
                 )
             }
-            
+
         }
 
         comments.forEach {
             CommentBody(it)
         }
 
-    }else{
+    } else {
 
 
         TextButton(onClick = {
 
-            if (NetworkChecker(context).isInternetConnected){
-                showCommentDialog.value= true
-            }else{
-                Toast.makeText(context, "Please connect to internet to add comment ", Toast.LENGTH_SHORT).show()
+            if (NetworkChecker(context).isInternetConnected) {
+                showCommentDialog.value = true
+            } else {
+                Toast.makeText(
+                    context,
+                    "Please connect to internet to add comment ",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
 
         }) {
-             Text(text = "Add New Comment",
-             style = TextStyle(fontSize = 13.sp))
+            Text(
+                text = "Add New Comment",
+                style = TextStyle(fontSize = 13.sp)
+            )
 
         }
     }
 
 
+    if (showCommentDialog.value) {
+        AddNewCommentDialog(
+
+            OnDismiss = { showCommentDialog.value = false },
+            OnPositiveClick = {
+                AddNewComment.invoke(it)
+            }
+
+        )
+
+
+    }
+
+
 }
+
+@Composable
+fun AddNewCommentDialog(
+    OnDismiss: () -> Unit,
+    OnPositiveClick: (String) -> Unit
+) {
+    val context = LocalContext.current
+    val userComment = remember { mutableStateOf("") }
+    Dialog(onDismissRequest = OnDismiss) {
+        Card(
+            modifier = Modifier.fillMaxHeight(0.52f),
+            elevation = 8.dp,
+            shape = Shapes.medium
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+
+
+                Text(text = "Write Your Comment",
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                MainTextField(edtValue = userComment.value ,
+                hint ="Write Your Comment ..." ){
+                    userComment.value = it
+                }
+
+               // Buttons =>
+                
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                  TextButton(onClick = { OnDismiss.invoke() }) {
+                      Text(text = "Cancel")
+                  }
+                    Spacer(modifier = Modifier. width(4.dp))
+
+                    TextButton(onClick = {
+
+                        if (userComment.value.isNotEmpty()&&userComment.value.isNotBlank()){
+                            if (NetworkChecker(context).isInternetConnected){
+                                OnPositiveClick(userComment.value)
+                                OnDismiss.invoke()
+                            }else{
+                                Toast.makeText(context, "Please connect to internet", Toast.LENGTH_SHORT).show()
+
+                            }
+
+                        }else{
+                            Toast.makeText(context, "Please Enter Your Comment", Toast.LENGTH_SHORT).show()
+                        }
+                    }) {
+                        Text(text = "Ok")
+                    }
+                }
+
+                
+            }
+
+
+        }
+
+    }
+
+}
+
+
+@Composable
+fun MainTextField(edtValue : String ,  hint : String , OnValueChanges : (String) -> Unit){
+    
+    OutlinedTextField(
+        label = { Text(text = hint)},
+        value = edtValue,
+        singleLine = false,
+        maxLines = 2,
+        onValueChange = OnValueChanges,
+        placeholder = { Text(text = "Write Your Comment ...")},
+        modifier = Modifier.fillMaxWidth(0.9f),
+        shape = Shapes.medium
+    )
+}
+
 
 @Composable
 fun ProductDetail(data: Product, commentNumber: String) {
@@ -263,7 +385,8 @@ fun ProductDetail(data: Product, commentNumber: String) {
 
             Row(
                 modifier = Modifier.padding(top = 10.dp),
-                verticalAlignment = Alignment.CenterVertically) {
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_details_material),
                     contentDescription = null,
@@ -280,7 +403,8 @@ fun ProductDetail(data: Product, commentNumber: String) {
 
             Row(
                 modifier = Modifier.padding(top = 10.dp),
-                verticalAlignment = Alignment.CenterVertically) {
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_details_sold),
                     contentDescription = null,
@@ -307,7 +431,7 @@ fun ProductDetail(data: Product, commentNumber: String) {
                 text = data.tags,
                 color = Color.White,
                 modifier = Modifier.padding(6.dp),
-                style = TextStyle(fontSize = 13.sp , fontWeight = FontWeight.Medium)
+                style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Medium)
             )
         }
 
