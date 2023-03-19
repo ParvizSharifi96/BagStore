@@ -1,10 +1,7 @@
 package com.example.bagstore_14.model.net
 
 
-import com.example.bagstore_14.model.data.AdsResponse
-import com.example.bagstore_14.model.data.CommentResponse
-import com.example.bagstore_14.model.data.LoginResponse
-import com.example.bagstore_14.model.data.ProductResponse
+import com.example.bagstore_14.model.data.*
 import com.example.bagstore_14.model.repository.TokenInMemory
 import com.example.bagstore_14.util.BASE_URL
 import com.google.gson.JsonObject
@@ -37,6 +34,8 @@ interface ApiService {
     suspend fun getAllComments(@Body jsonObject: JsonObject):CommentResponse
 
 
+    @POST("getNewComments")
+    suspend fun addNewComments(@Body jsonObject: JsonObject):AddNewCommentResponse
 }
 
 

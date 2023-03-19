@@ -7,6 +7,8 @@ interface CommentRepository {
 
 
     suspend fun getAllComments(productId : String) : List<Comment>
+    suspend fun addNewComments(productId : String ,  text :String , IsSuccess : (String) -> Unit)
+
 
 
 
