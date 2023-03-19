@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.ViewModel
 import coil.compose.AsyncImage
 import com.example.bagstore_14.R
 import com.example.bagstore_14.model.data.Comment
@@ -106,7 +107,23 @@ fun ProductScreen(productId: String) {
             )
 
         }
-        AddToCart()
+        AddToCart(viewModel.thisProduct.value.price ,
+            viewModel.isAddingProduct.value){
+            if(NetworkChecker(context).isInternetConnected){
+                viewModel.addProductToCart(productId ){
+                    Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                }
+
+                
+            }else{
+
+                Toast.makeText(context, "Please connect to internet", Toast.LENGTH_SHORT).show()
+                
+                
+            }
+
+
+        }
     }
 }
 
@@ -509,6 +526,11 @@ fun ProductToolbar(
 }
 
 @Composable
-fun AddToCart() {
+fun AddToCart(
+    price : String ,
+    isAddingProduct : Boolean ,
+    OnCartClicked: () -> Unit
+
+) {
 
 }

@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bagstore_14.model.data.Comment
+import com.example.bagstore_14.model.repository.cart.CartRepository
 import com.example.bagstore_14.model.repository.comment.CommentRepository
 import com.example.bagstore_14.model.repository.product.ProductRepository
 import com.example.bagstore_14.util.EMPTY_PRODUCT
@@ -15,10 +16,12 @@ import kotlinx.coroutines.launch
 
 class ProductViewModel(
     private val protectedRepository: ProductRepository,
-    private val commentRepository: CommentRepository
+    private val commentRepository: CommentRepository ,
+    private val cartRepository: CartRepository
 ) : ViewModel() {
     val thisProduct = mutableStateOf(EMPTY_PRODUCT)
     val comments = mutableStateOf(listOf<Comment>())
+    val isAddingProduct = mutableStateOf(false)
 
     fun loadData(productId: String, isInternetConnected: Boolean) {
         loadProductFromCache(productId)
@@ -57,4 +60,26 @@ class ProductViewModel(
             comments.value =  commentRepository.getAllComments(productId)
         }
     }
+    fun addProductToCart(productId: String , AddingToCartResult :(String) -> Unit) {
+
+        viewModelScope.launch(coroutineExceptionHandler) {
+
+            isAddingProduct.value = true
+
+            val result = cartRepository.addToCart(productId)
+            delay(500)
+
+            isAddingProduct.value = false
+
+            if(result) {
+                AddingToCartResult.invoke("Product Added to Cart")
+            } else {
+                AddingToCartResult.invoke("Product not Added")
+            }
+
+
+        }
+
+    }
+
 }
