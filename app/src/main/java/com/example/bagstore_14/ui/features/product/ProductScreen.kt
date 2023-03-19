@@ -10,11 +10,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -122,8 +125,113 @@ fun ProductItem(data: Product, comments : List<Comment> ,onCategoryClicked: (Str
             modifier = Modifier.padding(top = 14.dp, bottom = 4.dp)
         )
 
+        ProductComments(comments){
 
 
+        }
+
+
+
+
+    }
+
+
+}
+@Composable
+fun CommentBody(comment : Comment){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
+        elevation = 0.dp,
+        shape = Shapes.large
+    ) {
+
+        Column(modifier = Modifier.padding(12.dp)) {
+
+            Text(
+                text = comment.userEmail,
+                style = TextStyle(fontSize = 15.sp),
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                modifier = Modifier.padding(top = 10.dp),
+                text = comment.text,
+                style = TextStyle(fontSize = 13.sp),
+
+            )
+
+        }
+        Divider(
+            color = Color.LightGray,
+            thickness = 1.dp,
+            modifier = Modifier.padding(top = 14.dp, bottom = 4.dp)
+        )
+    }
+
+}
+
+
+@Composable
+fun ProductComments(comments: List<Comment>, AddNewComment:(String) -> Unit) {
+
+ val showCommentDialog = remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    if (comments.isNotEmpty()){
+        Row (
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+
+            Text(
+                text ="Comments",
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium
+                ))
+            
+            TextButton(onClick = {
+
+                if (NetworkChecker(context).isInternetConnected){
+                    showCommentDialog.value = true
+                }else{
+
+                    Toast.makeText(context, "Please Connect to internet", Toast.LENGTH_SHORT).show()
+
+                }
+            }) {
+
+                Text(text = "Add New Comment"
+                , style = TextStyle(fontSize = 14.sp)
+                )
+            }
+            
+        }
+
+        comments.forEach {
+            CommentBody(it)
+        }
+
+    }else{
+
+
+        TextButton(onClick = {
+
+            if (NetworkChecker(context).isInternetConnected){
+                showCommentDialog.value= true
+            }else{
+                Toast.makeText(context, "Please connect to internet to add comment ", Toast.LENGTH_SHORT).show()
+            }
+
+
+        }) {
+             Text(text = "Add New Comment",
+             style = TextStyle(fontSize = 13.sp))
+
+        }
     }
 
 
