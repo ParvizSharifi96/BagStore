@@ -1,6 +1,7 @@
 package com.example.bagstore_14.ui.features.product
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -15,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -22,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.bagstore_14.R
 import com.example.bagstore_14.model.data.Product
 import com.example.bagstore_14.ui.theme.BackgroundMain
 import com.example.bagstore_14.ui.theme.MainAppTheme
@@ -87,9 +90,9 @@ fun ProductScreen(productId: String) {
             )
 
             ProductItem(data = viewModel.thisProduct.value,
-            onCategoryClicked = {
-                navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
-            }
+                onCategoryClicked = {
+                    navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
+                }
             )
 
         }
@@ -98,23 +101,115 @@ fun ProductScreen(productId: String) {
 }
 
 @Composable
-fun ProductItem(data : Product ,onCategoryClicked: (String) -> Unit ){
-Column(
-    modifier = Modifier.padding(16.dp)
-) {
-    ProductDesign(data , onCategoryClicked)
-}
+fun ProductItem(data: Product, onCategoryClicked: (String) -> Unit) {
+    Column(
+        modifier = Modifier.padding(16.dp)
+    ) {
+        ProductDesign(data, onCategoryClicked)
+
+        Divider(
+            color = Color.LightGray,
+            thickness = 1.dp,
+            modifier = Modifier.padding(top = 14.dp, bottom = 14.dp)
+        )
+        ProductDetail(data , "5")
+
+        Divider(
+            color = Color.LightGray,
+            thickness = 1.dp,
+            modifier = Modifier.padding(top = 14.dp, bottom = 4.dp)
+        )
+
+
+    }
 
 
 }
 
+@Composable
+fun ProductDetail(data: Product, commentNumber: String) {
 
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_details_comment),
+                    contentDescription = null,
+                    modifier = Modifier.size(26.dp)
+                )
+
+                Text(
+                    text = "$commentNumber comments",
+                    modifier = Modifier.padding(start = 6.dp),
+                    fontSize = 13.sp
+                )
+
+            }
+
+            Row(
+                modifier = Modifier.padding(top = 10.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_details_material),
+                    contentDescription = null,
+                    modifier = Modifier.size(26.dp)
+                )
+
+                Text(
+                    text = data.material,
+                    modifier = Modifier.padding(start = 6.dp),
+                    fontSize = 13.sp
+                )
+
+            }
+
+            Row(
+                modifier = Modifier.padding(top = 10.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_details_sold),
+                    contentDescription = null,
+                    modifier = Modifier.size(26.dp)
+                )
+
+                Text(
+                    text = data.soldItem + " sold",
+                    modifier = Modifier.padding(start = 6.dp),
+                    fontSize = 13.sp
+                )
+
+            }
+        }
+
+        Surface(
+            modifier = Modifier
+                .clip(Shapes.large)
+                .align(Alignment.Bottom),
+            color = Color.Blue
+        ) {
+
+            Text(
+                text = data.tags,
+                color = Color.White,
+                modifier = Modifier.padding(6.dp),
+                style = TextStyle(fontSize = 13.sp , fontWeight = FontWeight.Medium)
+            )
+        }
+
+    }
+
+
+}
 
 @Composable
 fun ProductDesign(data: Product, onCategoryClicked: (String) -> Unit) {
     AsyncImage(
         model = data.imgUrl,
-        contentDescription =null ,
+        contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = Modifier
             .fillMaxWidth()
@@ -134,13 +229,14 @@ fun ProductDesign(data: Product, onCategoryClicked: (String) -> Unit) {
     Text(
         modifier = Modifier.padding(top = 4.dp),
         text = data.detailText,
-        style = TextStyle(fontSize = 15.sp , textAlign = TextAlign.Justify)
+        style = TextStyle(fontSize = 15.sp, textAlign = TextAlign.Justify)
     )
 
     TextButton(onClick = { onCategoryClicked.invoke(data.category) }) {
-        Text(text = "#" + data.category,
-        style = TextStyle(fontSize = 13.sp)
-            )
+        Text(
+            text = "#" + data.category,
+            style = TextStyle(fontSize = 13.sp)
+        )
 
     }
 
