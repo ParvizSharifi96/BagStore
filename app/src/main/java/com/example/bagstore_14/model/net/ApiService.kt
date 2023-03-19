@@ -2,6 +2,7 @@ package com.example.bagstore_14.model.net
 
 
 import com.example.bagstore_14.model.data.AdsResponse
+import com.example.bagstore_14.model.data.CommentResponse
 import com.example.bagstore_14.model.data.LoginResponse
 import com.example.bagstore_14.model.data.ProductResponse
 import com.example.bagstore_14.model.repository.TokenInMemory
@@ -30,6 +31,10 @@ interface ApiService {
 
     @GET("getSliderPics")
     suspend fun getAllAds() : AdsResponse
+
+
+    @POST("getComments")
+    suspend fun getAllComments(@Body jsonObject: JsonObject):CommentResponse
 
 
 }

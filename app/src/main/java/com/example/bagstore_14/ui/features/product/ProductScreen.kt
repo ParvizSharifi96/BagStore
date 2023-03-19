@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.bagstore_14.R
+import com.example.bagstore_14.model.data.Comment
 import com.example.bagstore_14.model.data.Product
 import com.example.bagstore_14.ui.theme.BackgroundMain
 import com.example.bagstore_14.ui.theme.MainAppTheme
@@ -56,7 +57,7 @@ fun ProductScreen(productId: String) {
 
     val context = LocalContext.current
     val viewModel = getNavViewModel<ProductViewModel>()
-    viewModel.loadData(productId)
+    viewModel.loadData(productId ,  NetworkChecker(context).isInternetConnected)
     val navigation = getNavController()
 
     Box(
@@ -90,6 +91,7 @@ fun ProductScreen(productId: String) {
             )
 
             ProductItem(data = viewModel.thisProduct.value,
+                comments = viewModel.comments.value,
                 onCategoryClicked = {
                     navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
                 }
@@ -101,7 +103,7 @@ fun ProductScreen(productId: String) {
 }
 
 @Composable
-fun ProductItem(data: Product, onCategoryClicked: (String) -> Unit) {
+fun ProductItem(data: Product, comments : List<Comment> ,onCategoryClicked: (String) -> Unit) {
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
@@ -112,13 +114,14 @@ fun ProductItem(data: Product, onCategoryClicked: (String) -> Unit) {
             thickness = 1.dp,
             modifier = Modifier.padding(top = 14.dp, bottom = 14.dp)
         )
-        ProductDetail(data , "5")
+        ProductDetail(data , comments.size.toString())
 
         Divider(
             color = Color.LightGray,
             thickness = 1.dp,
             modifier = Modifier.padding(top = 14.dp, bottom = 4.dp)
         )
+
 
 
     }
