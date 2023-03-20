@@ -16,6 +16,7 @@ import com.example.bagstore_14.ui.features.SignUp.SignUpViewModel
 import com.example.bagstore_14.ui.features.category.CategoryViewModel
 import com.example.bagstore_14.ui.features.main.MainViewModel
 import com.example.bagstore_14.ui.features.product.ProductViewModel
+import com.example.bagstore_14.ui.features.profile.ProfileViewModel
 import com.example.bagstore_14.ui.features.signIn.SignInViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -40,6 +41,8 @@ val myModules = module {
     single<CommentRepository> { CommentRepositoryImpl(get()) }
     single<CartRepository> { CartRepositoryImpl(get()) }
 
+
+    viewModel { ProfileViewModel(get()) }
     viewModel { ProductViewModel(get() , get(), get()) }
     viewModel { SignUpViewModel(get()) }
     viewModel { SignInViewModel(get()) }

@@ -82,6 +82,9 @@ fun SingUpScreen() {
              MainCardView(navigation,viewModel){
                  viewModel.signUpUser{
                      if (it == VALUE_SUCCESS){
+
+
+
                          navigation.navigate(MyScreens.MainScreen.route){
 
                              popUpTo(MyScreens.MainScreen.route){

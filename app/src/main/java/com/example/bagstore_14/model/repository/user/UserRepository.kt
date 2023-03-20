@@ -16,6 +16,13 @@ interface UserRepository {
     fun getUserName():String?
 
 
+    fun saveUserLocation(address :String , postalCode :String)
+    fun getUserLocation() :Pair<String , String>
+
+    fun saveUserLoginTime()
+    fun getUserLoginTime() :String
+
+
 
 
 }

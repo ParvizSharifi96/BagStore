@@ -20,6 +20,7 @@ import com.example.bagstore_14.ui.features.SignUp.SingUpScreen
 import com.example.bagstore_14.ui.features.category.CategoryScreen
 import com.example.bagstore_14.ui.features.main.MainScreen
 import com.example.bagstore_14.ui.features.product.ProductScreen
+import com.example.bagstore_14.ui.features.profile.ProfileScreen
 import com.example.bagstore_14.ui.features.signIn.SingInScreen
 import com.example.bagstore_14.ui.theme.BackgroundMain
 import com.example.bagstore_14.ui.theme.MainAppTheme
@@ -131,8 +132,4 @@ fun CartScreen() {
 
 }
 
-@Composable
-fun ProfileScreen() {
-
-}
 
