@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bagstore_14.model.data.Ads
 import com.example.bagstore_14.model.data.Product
+import com.example.bagstore_14.model.repository.cart.CartRepository
 import com.example.bagstore_14.model.repository.product.ProductRepository
 import com.example.bagstore_14.util.coroutineExceptionHandler
 import kotlinx.coroutines.async
@@ -14,13 +15,18 @@ import kotlinx.coroutines.launch
 
 
 class MainViewModel(
+
+
     private val productRepository: ProductRepository,
+    private val cartRepository: CartRepository,
     isInternetConnected: Boolean
+
 ) : ViewModel() {
 
     val dataProducts = mutableStateOf<List<Product>>(listOf())
     val dataAds = mutableStateOf<List<Ads>>(listOf())
     val showProgressBar = mutableStateOf(false)
+    val badgeNumber = mutableStateOf(0)
 
     init {
 
@@ -51,6 +57,14 @@ class MainViewModel(
 
         dataProducts.value = products
         dataAds . value = ads
+
+    }
+
+
+     fun loadBadgeNumber(){
+        viewModelScope.launch(coroutineExceptionHandler) {
+            badgeNumber.value = cartRepository.getCartSize()
+        }
 
     }
 

@@ -43,7 +43,7 @@ val myModules = module {
     viewModel { ProductViewModel(get() , get(), get()) }
     viewModel { SignUpViewModel(get()) }
     viewModel { SignInViewModel(get()) }
-    viewModel { (isNetConnected: Boolean) -> MainViewModel(get(), isNetConnected) }
+    viewModel { (isNetConnected: Boolean) -> MainViewModel(get(),get() , isNetConnected) }
     viewModel { CategoryViewModel(get()) }
 
 }

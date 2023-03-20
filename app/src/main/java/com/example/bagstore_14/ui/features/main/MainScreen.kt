@@ -1,6 +1,6 @@
 package com.example.bagstore_14.ui.features.main
 
-import android.widget.Toast
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +26,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.bagstore_14.R
 import com.example.bagstore_14.model.data.Ads
 import com.example.bagstore_14.model.data.Product
 import com.example.bagstore_14.ui.theme.*
@@ -39,7 +37,6 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
 import org.koin.core.parameter.parametersOf
-import javax.security.auth.Subject
 
 
 @Preview(showBackground = true)
@@ -66,6 +63,13 @@ fun MainScreen() {
         getNavViewModel<MainViewModel>(parameters = { parametersOf(NetworkChecker(context).isInternetConnected) })
     val navigation = getNavController()
 
+    if (NetworkChecker(context).isInternetConnected){
+
+
+        viewModel.loadBadgeNumber()
+    }
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -84,6 +88,7 @@ fun MainScreen() {
         }
 
         TopToolbar(
+            badgeNumber = viewModel.badgeNumber.value,
             onCardClicked = { navigation.navigate(MyScreens.CartScreen.route) },
             onProfileClicked = { navigation.navigate(MyScreens.ProfileScreen.route) })
         CategoryBar(CATEGORY) {
@@ -130,7 +135,7 @@ fun ProductSubjectList(
 
 
 @Composable
-fun TopToolbar(onCardClicked: () -> Unit, onProfileClicked: () -> Unit) {
+fun TopToolbar(badgeNumber: Int , onCardClicked: () -> Unit, onProfileClicked: () -> Unit) {
 
     TopAppBar(
         elevation = 0.dp,
@@ -138,9 +143,19 @@ fun TopToolbar(onCardClicked: () -> Unit, onProfileClicked: () -> Unit) {
         title = { Text(text = "BagStore-14") },
         actions = {
 
-            IconButton(onClick = { onCardClicked.invoke() }) {
-                Icon(Icons.Default.ShoppingCart, null)
+            IconButton(
+                onClick = { onCardClicked.invoke() }) {
+
+                if (badgeNumber == 0) {
+                    Icon(Icons.Default.ShoppingCart, null)
+                } else {
+
+                    BadgedBox(badge = { Badge { Text(badgeNumber.toString()) } }) {
+                        Icon(Icons.Default.ShoppingCart, null)
+                    }
+                }
             }
+
 
             IconButton(onClick = { onProfileClicked.invoke() }) {
                 Icon(Icons.Default.Person, null)

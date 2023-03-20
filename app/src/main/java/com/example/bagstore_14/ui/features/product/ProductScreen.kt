@@ -81,7 +81,10 @@ fun ProductScreen(productId: String) {
                 .padding(bottom = 58.dp)
         ) {
 
-            ProductToolbar(productName = "Details", badgeNumber = 0, OnBackClicked = {
+            ProductToolbar(
+                productName = "Details",
+                badgeNumber = viewModel.badgeNumber.value,
+                OnBackClicked = {
                 navigation.popBackStack()
             }, OnCartClicked = {
 
