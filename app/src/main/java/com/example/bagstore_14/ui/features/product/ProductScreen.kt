@@ -43,6 +43,7 @@ import com.example.bagstore_14.ui.theme.PriceBackground
 import com.example.bagstore_14.ui.theme.Shapes
 import com.example.bagstore_14.util.MyScreens
 import com.example.bagstore_14.util.NetworkChecker
+import com.example.bagstore_14.util.stylePrice
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
 
@@ -96,8 +97,9 @@ fun ProductScreen(productId: String) {
                 }
             })
 
+            val comments = if (NetworkChecker(context).isInternetConnected) viewModel.comments.value else listOf()
             ProductItem(data = viewModel.thisProduct.value,
-                comments = viewModel.comments.value,
+                comments = comments,
                 onCategoryClicked = {
                     navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
                 }, OnAddNewComment = {
@@ -379,6 +381,7 @@ fun MainTextField(edtValue: String, hint: String, OnValueChanges: (String) -> Un
 @Composable
 fun ProductDetail(data: Product, commentNumber: String) {
 
+    val context = LocalContext.current
     Row(
         modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -391,8 +394,9 @@ fun ProductDetail(data: Product, commentNumber: String) {
                     modifier = Modifier.size(26.dp)
                 )
 
+                val commentText = if (NetworkChecker(context).isInternetConnected)"$commentNumber comments" else "No Internet"
                 Text(
-                    text = "$commentNumber comments",
+                    text = commentText,
                     modifier = Modifier.padding(start = 6.dp),
                     fontSize = 13.sp
                 )
@@ -590,7 +594,7 @@ fun AddToCart(
                         top = 6.dp,
                         bottom = 6.dp
                     ),
-                    text = price + " Tomans ",
+                    text = stylePrice(price),
                     style = TextStyle(fontSize = 14.sp),
                     fontWeight = FontWeight.Medium
                 )

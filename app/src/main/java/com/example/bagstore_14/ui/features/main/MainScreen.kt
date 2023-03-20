@@ -1,6 +1,7 @@
 package com.example.bagstore_14.ui.features.main
 
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -29,10 +30,7 @@ import coil.compose.AsyncImage
 import com.example.bagstore_14.model.data.Ads
 import com.example.bagstore_14.model.data.Product
 import com.example.bagstore_14.ui.theme.*
-import com.example.bagstore_14.util.CATEGORY
-import com.example.bagstore_14.util.MyScreens
-import com.example.bagstore_14.util.NetworkChecker
-import com.example.bagstore_14.util.TAGS
+import com.example.bagstore_14.util.*
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dev.burnoo.cokoin.navigation.getNavController
 import dev.burnoo.cokoin.navigation.getNavViewModel
@@ -89,7 +87,12 @@ fun MainScreen() {
 
         TopToolbar(
             badgeNumber = viewModel.badgeNumber.value,
-            onCardClicked = { navigation.navigate(MyScreens.CartScreen.route) },
+            onCardClicked = {
+                if(NetworkChecker(context).isInternetConnected)
+                navigation.navigate(MyScreens.CartScreen.route)
+                else
+                    Toast.makeText(context , "No Internet", Toast.LENGTH_SHORT).show()
+                            },
             onProfileClicked = { navigation.navigate(MyScreens.ProfileScreen.route) })
         CategoryBar(CATEGORY) {
             navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
@@ -255,7 +258,7 @@ fun ProductItem(product: Product ,  onProductClicked: (String) -> Unit) {
     Card(
         modifier = Modifier
             .padding(start = 16.dp)
-            .clickable { onProductClicked.invoke(product.productId)},
+            .clickable { onProductClicked.invoke(product.productId) },
         elevation = 4.dp,
         shape = Shapes.large
     ) {
@@ -283,7 +286,7 @@ fun ProductItem(product: Product ,  onProductClicked: (String) -> Unit) {
 
                 Text(
                     modifier = Modifier.padding(top = 4.dp),
-                    text = product.price + "Tomans",
+                    text = stylePrice(product.price),
                     style = TextStyle(fontSize = 14.sp)
                 )
 
@@ -310,7 +313,7 @@ fun BigPictureTablighat(ads: Ads ,  onProductClicked: (String) -> Unit) {
             .height(260.dp)
             .padding(top = 32.dp, start = 16.dp, end = 16.dp)
             .clip(Shapes.medium)
-            .clickable {onProductClicked.invoke(ads.productId) },
+            .clickable { onProductClicked.invoke(ads.productId) },
         contentDescription = null,
         contentScale = ContentScale.Crop
     )
