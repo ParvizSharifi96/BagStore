@@ -6,10 +6,12 @@ import com.example.bagstore_14.model.repository.TokenInMemory
 import com.example.bagstore_14.util.VALUE_SUCCESS
 import com.google.gson.JsonObject
 
+
 class UserRepositoryImpl(
     private val apiService: ApiService,
     private val sharedPref: SharedPreferences
 ) : UserRepository {
+
     override suspend fun signUp(name: String, username: String, password: String): String {
 
         val jsonObject = JsonObject().apply {
@@ -17,13 +19,16 @@ class UserRepositoryImpl(
             addProperty("email", username)
             addProperty("password", password)
         }
+
         val result = apiService.signUp(jsonObject)
         if (result.success) {
             TokenInMemory.refreshToken(username, result.token)
             saveToken(result.token)
-            saveUserName(username)
-            return VALUE_SUCCESS
 
+            saveUserName(username)
+            saveUserLoginTime()
+
+            return VALUE_SUCCESS
         } else {
             return result.message
         }
@@ -31,59 +36,51 @@ class UserRepositoryImpl(
     }
 
     override suspend fun signIn(username: String, password: String): String {
+
         val jsonObject = JsonObject().apply {
             addProperty("email", username)
             addProperty("password", password)
         }
-        val result = apiService . signIn(jsonObject)
-        if (result.success){
+
+        val result = apiService.signIn(jsonObject)
+        if (result.success) {
             TokenInMemory.refreshToken(username, result.token)
             saveToken(result.token)
+
             saveUserName(username)
             saveUserLoginTime()
+
             return VALUE_SUCCESS
-
-        }else{
+        } else {
             return result.message
-
         }
-
 
     }
 
     override fun signOut() {
-
         TokenInMemory.refreshToken(null, null)
         sharedPref.edit().clear().apply()
     }
 
     override fun loadToken() {
-        TokenInMemory.refreshToken(getUserName() , getToken())
-
+        TokenInMemory.refreshToken(getUserName(), getToken())
     }
 
     override fun saveToken(newToken: String) {
-        sharedPref.edit().putString("token" , newToken).apply()
-
+        sharedPref.edit().putString("token", newToken).apply()
     }
 
     override fun getToken(): String? {
-       return sharedPref.getString("token" , null)
-
+        return sharedPref.getString("token", null)
     }
 
     override fun saveUserName(username: String) {
-        sharedPref.edit().putString("username" , username).apply()
+        sharedPref.edit().putString("username", username).apply()
     }
 
     override fun getUserName(): String? {
-        return sharedPref.getString("username" , null)
-
+        return sharedPref.getString("username", null)
     }
-
-
-
-
 
     override fun saveUserLocation(address: String, postalCode: String) {
         sharedPref.edit().putString("address", address).apply()
@@ -105,4 +102,5 @@ class UserRepositoryImpl(
     override fun getUserLoginTime(): String {
         return sharedPref.getString("login_time", "0")!!
     }
+
 }

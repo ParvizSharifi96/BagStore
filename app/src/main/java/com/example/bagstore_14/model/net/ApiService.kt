@@ -6,6 +6,7 @@ import com.example.bagstore_14.model.repository.TokenInMemory
 import com.example.bagstore_14.util.BASE_URL
 import com.google.gson.JsonObject
 import okhttp3.OkHttpClient
+import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
@@ -21,46 +22,52 @@ interface ApiService {
     suspend fun signIn(@Body jsonObject: JsonObject): LoginResponse
 
     @GET("refreshToken")
-    fun refreshToken(): retrofit2.Call<LoginResponse>
+    fun refreshToken(): Call<LoginResponse>
 
     @GET("getProducts")
-    suspend fun getAllProducts() : ProductResponse
+    suspend fun getAllProducts(): ProductResponse
 
     @GET("getSliderPics")
-    suspend fun getAllAds() : AdsResponse
-
+    suspend fun getAllAds(): AdsResponse
 
     @POST("getComments")
-    suspend fun getAllComments(@Body jsonObject: JsonObject):CommentResponse
+    suspend fun getAllComments(@Body jsonObject: JsonObject): CommentResponse
 
-
-    @POST("getNewComments")
-    suspend fun addNewComments(@Body jsonObject: JsonObject):AddNewCommentResponse
-
+    @POST("addNewComment")
+    suspend fun addNewComment(@Body jsonObject: JsonObject): AddNewCommentResponse
 
     @POST("addToCart")
-    suspend fun addProductToCart(@Body jsonObject: JsonObject) : CartResponse
+    suspend fun addProductToCart(@Body jsonObject: JsonObject): CartResponse
 
     @GET("getUserCart")
     suspend fun getUserCart(): UserCartInfo
 
+    @POST("removeFromCart")
+    suspend fun removeFromCart(@Body jsonObject: JsonObject): CartResponse
+
+    @POST("submitOrder")
+    suspend fun submitOrder(@Body jsonObject: JsonObject): SubmitOrder
+
+    @POST("checkout")
+    suspend fun checkOut(@Body jsonObject: JsonObject) :CheckOut
+
 }
 
-
-fun createApiService():ApiService{
+fun createApiService(): ApiService {
 
     val okHttpClient = OkHttpClient.Builder()
         .addInterceptor {
 
             val oldRequest = it.request()
+
             val newRequest = oldRequest.newBuilder()
-            if (TokenInMemory.token!= null)
+            if (TokenInMemory.token != null)
                 newRequest.addHeader("Authorization", TokenInMemory.token!!)
-            newRequest.addHeader("Accept" , "application/json")
-            newRequest.method(oldRequest.method , oldRequest.body)
+
+            newRequest.addHeader("Accept", "application/json")
+            newRequest.method(oldRequest.method, oldRequest.body)
+
             return@addInterceptor it.proceed(newRequest.build())
-
-
         }.build()
 
     val retrofit = Retrofit.Builder()
@@ -70,6 +77,4 @@ fun createApiService():ApiService{
         .build()
 
     return retrofit.create(ApiService::class.java)
-
-
 }

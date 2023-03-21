@@ -13,15 +13,15 @@ import kotlinx.coroutines.launch
 
 
 class CategoryViewModel(
-    private val productRepository: ProductRepository,
-
+    private val productRepository: ProductRepository
 ) : ViewModel() {
     val dataProducts = mutableStateOf<List<Product>>(listOf())
-    fun loadDataByCategory(category  : String) {
 
-        viewModelScope.launch(){
+    fun loadDataByCategory(category: String) {
 
-            val dataFromLocal = productRepository.getAllProductByCategory(category)
+        viewModelScope.launch {
+
+            val dataFromLocal = productRepository.getAllProductsByCategory(category)
             dataProducts.value = dataFromLocal
 
         }

@@ -8,15 +8,15 @@ import com.example.bagstore_14.model.net.ApiService
 class ProductRepositoryImpl(
     private val apiService: ApiService,
     private val productDao: ProductDao
-    ) : ProductRepository {
-    override suspend fun getAllProducts(isInternetConnected : Boolean): List<Product> {
+) : ProductRepository {
 
+    override suspend fun getAllProducts(isInternetConnected: Boolean): List<Product> {
 
-        if(isInternetConnected) {
+        if (isInternetConnected) {
 
             // get data from net
             val dataFromServer = apiService.getAllProducts()
-            if(dataFromServer.success) {
+            if (dataFromServer.success) {
                 productDao.insertOrUpdate(dataFromServer.products)
                 return dataFromServer.products
             }
@@ -31,13 +31,14 @@ class ProductRepositoryImpl(
         return listOf()
     }
 
-    override suspend fun getAllAds(isInternetConnected : Boolean): List<Ads> {
-        if(isInternetConnected) {
+    override suspend fun getAllAds(isInternetConnected: Boolean): List<Ads> {
+
+        if (isInternetConnected) {
 
             // get ads
 
             val dataFromServer = apiService.getAllAds()
-            if(dataFromServer.success) {
+            if (dataFromServer.success) {
                 return dataFromServer.ads
             }
 
@@ -47,13 +48,12 @@ class ProductRepositoryImpl(
         return listOf()
     }
 
-    override suspend fun getAllProductByCategory(category: String): List<Product> {
+    override suspend fun getAllProductsByCategory(category: String): List<Product> {
         return productDao.getAllByCategory(category)
     }
 
-    override suspend fun getProductById(productId: String) : Product {
+    override suspend fun getProductById(productId: String): Product {
         return productDao.getProductById(productId)
-
     }
 
 

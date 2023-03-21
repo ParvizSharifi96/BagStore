@@ -8,7 +8,8 @@ import com.example.bagstore_14.model.repository.user.UserRepository
 
 class ProfileViewModel(
     private val userRepository: UserRepository
-    ) : ViewModel() {
+) : ViewModel() {
+
     val email = mutableStateOf("")
     val address = mutableStateOf("")
     val postalCode = mutableStateOf("")

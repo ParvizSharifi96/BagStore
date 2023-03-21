@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bagstore_14.model.data.Ads
+import com.example.bagstore_14.model.data.CheckOut
 import com.example.bagstore_14.model.data.Product
 import com.example.bagstore_14.model.repository.cart.CartRepository
 import com.example.bagstore_14.model.repository.product.ProductRepository
@@ -14,13 +15,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
+
 class MainViewModel(
-
-
     private val productRepository: ProductRepository,
     private val cartRepository: CartRepository,
     isInternetConnected: Boolean
-
 ) : ViewModel() {
 
     val dataProducts = mutableStateOf<List<Product>>(listOf())
@@ -28,45 +27,66 @@ class MainViewModel(
     val showProgressBar = mutableStateOf(false)
     val badgeNumber = mutableStateOf(0)
 
+    val showPaymentResultDialog = mutableStateOf(false)
+    val checkoutData = mutableStateOf(CheckOut(null, null))
+
     init {
-
-
         refreshAllDataFromNet(isInternetConnected)
     }
-    private fun refreshAllDataFromNet(isInternetConnected: Boolean) {
 
-        viewModelScope.launch(coroutineExceptionHandler ){
-            if (isInternetConnected)
-                showProgressBar.value = true
-            delay(1500)
+    fun getCheckoutData() {
 
-            val newDataProducts=async { productRepository.getAllProducts(isInternetConnected) }
-            val newDataAds = async { productRepository.getAllAds(isInternetConnected)  }
+        viewModelScope.launch(coroutineExceptionHandler) {
 
+            val result = cartRepository.checkOut(cartRepository.getOrderId())
+            if (result.success!!) {
+                checkoutData.value = result
+                showPaymentResultDialog.value = true
+            }
 
-            updateData(newDataProducts.await() , newDataAds.await())
-            showProgressBar.value = false
         }
 
+    }
 
+    fun getPaymentStatus(): Int {
+        return cartRepository.getPurchaseStatus()
+    }
+
+    fun setPaymentStatus(status: Int) {
+        cartRepository.setPurchaseStatus(status)
+    }
+
+    private fun refreshAllDataFromNet(isInternetConnected: Boolean) {
+
+        viewModelScope.launch(coroutineExceptionHandler) {
+
+            if (isInternetConnected)
+                showProgressBar.value = true
+
+            delay(1000)
+
+            val newDataProducts = async { productRepository.getAllProducts(isInternetConnected) }
+            val newDataAds = async { productRepository.getAllAds(isInternetConnected) }
+
+            updateData(newDataProducts.await(), newDataAds.await())
+
+            showProgressBar.value = false
+
+        }
 
     }
 
-    private fun updateData(products : List<Product>, ads : List<Ads>) {
-
-
+    private fun updateData(products: List<Product>, ads: List<Ads>) {
         dataProducts.value = products
-        dataAds . value = ads
-
+        dataAds.value = ads
     }
 
+    fun loadBadgeNumber() {
 
-     fun loadBadgeNumber(){
         viewModelScope.launch(coroutineExceptionHandler) {
             badgeNumber.value = cartRepository.getCartSize()
         }
 
     }
-
 
 }

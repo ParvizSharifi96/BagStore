@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-    Log.v("error" , "Error -> " + throwable.message)
+    Log.v("error", "Error -> " + throwable.message)
 }
 
 fun stylePrice(oldPrice: String): String {
@@ -37,10 +37,11 @@ fun stylePrice(oldPrice: String): String {
 
     return oldPrice + " Tomans"
 }
+
 @SuppressLint("SimpleDateFormat")
 fun styleTime(timeInMillies: Long): String {
 
-    val formatter = SimpleDateFormat("yyyy.MM.dd - hh:mm")
+    val formatter = SimpleDateFormat("yyyy/MM/dd hh:mm")
 
     val calendar = Calendar.getInstance()
     calendar.timeInMillis = timeInMillies

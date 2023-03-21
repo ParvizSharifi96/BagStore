@@ -1,6 +1,7 @@
 package com.example.bagstore_14.ui
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,12 +17,13 @@ import com.example.bagstore_14.di.myModules
 import com.example.bagstore_14.model.repository.TokenInMemory
 import com.example.bagstore_14.model.repository.user.UserRepository
 import com.example.bagstore_14.ui.features.IntroScreen
-import com.example.bagstore_14.ui.features.SignUp.SingUpScreen
+import com.example.bagstore_14.ui.features.SignUp.SignUpScreen
+import com.example.bagstore_14.ui.features.cart.CartScreen
 import com.example.bagstore_14.ui.features.category.CategoryScreen
 import com.example.bagstore_14.ui.features.main.MainScreen
 import com.example.bagstore_14.ui.features.product.ProductScreen
 import com.example.bagstore_14.ui.features.profile.ProfileScreen
-import com.example.bagstore_14.ui.features.signIn.SingInScreen
+import com.example.bagstore_14.ui.features.signIn.SignInScreen
 import com.example.bagstore_14.ui.theme.BackgroundMain
 import com.example.bagstore_14.ui.theme.MainAppTheme
 import com.example.bagstore_14.util.KEY_CATEGORY_ARG
@@ -32,29 +34,34 @@ import dev.burnoo.cokoin.get
 import dev.burnoo.cokoin.navigation.KoinNavHost
 import org.koin.android.ext.koin.androidContext
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        window.decorView.layoutDirection = View.LAYOUT_DIRECTION_LTR
         setContent {
 
             Koin(appDeclaration = {
                 androidContext(this@MainActivity)
                 modules(myModules)
-
             }) {
                 MainAppTheme {
                     Surface(color = BackgroundMain, modifier = Modifier.fillMaxSize()) {
-                        val userRepository: UserRepository = get()
+
+                        val userRepository :UserRepository = get()
                         userRepository.loadToken()
-                        BagStoreUi()
+
+                        DuniBazaarUi()
 
                     }
                 }
             }
 
         }
+
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
@@ -63,22 +70,19 @@ fun DefaultPreview() {
             color = BackgroundMain,
             modifier = Modifier.fillMaxSize()
         ) {
-            BagStoreUi()
+            DuniBazaarUi()
         }
     }
 }
 
-
 @Composable
-fun BagStoreUi() {
+fun DuniBazaarUi() {
     val navController = rememberNavController()
-    KoinNavHost(
-        navController = navController,
-        startDestination = MyScreens.MainScreen.route
-    ) {
+    KoinNavHost(navController = navController, startDestination = MyScreens.MainScreen.route) {
+
         composable(MyScreens.MainScreen.route) {
 
-            if (TokenInMemory.token !=null) {
+            if(TokenInMemory.token != null) {
                 MainScreen()
             } else {
                 IntroScreen()
@@ -92,7 +96,9 @@ fun BagStoreUi() {
                 type = NavType.StringType
             })
         ) {
+
             ProductScreen(it.arguments!!.getString(KEY_PRODUCT_ARG, "null"))
+
         }
 
         composable(
@@ -113,23 +119,13 @@ fun BagStoreUi() {
         }
 
         composable(MyScreens.SignUpScreen.route) {
-            SingUpScreen()
+            SignUpScreen()
         }
 
         composable(MyScreens.SignInScreen.route) {
-            SingInScreen()
+            SignInScreen()
         }
-
 
     }
 
-
 }
-
-
-@Composable
-fun CartScreen() {
-
-}
-
-

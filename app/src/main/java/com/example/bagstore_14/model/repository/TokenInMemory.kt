@@ -1,5 +1,6 @@
 package com.example.bagstore_14.model.repository
 
+
 object TokenInMemory {
 
     var username: String? = null
@@ -8,10 +9,9 @@ object TokenInMemory {
     var token: String? = null
         private set
 
-
-    fun  refreshToken(username: String? , newToken:String?){
-
+    fun refreshToken(username: String? , newToken: String? ) {
         this.username = username
         this.token = newToken
     }
+
 }

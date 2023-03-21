@@ -72,7 +72,7 @@ fun ProfileScreen() {
             Button(
                 onClick = {
 
-                    Toast.makeText(context, "Goodbye", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Hope to see you again :)", Toast.LENGTH_SHORT).show()
                     viewModel.signOut()
 
                     navigation.navigate(MyScreens.MainScreen.route) {
@@ -93,26 +93,26 @@ fun ProfileScreen() {
 
 
         }
+
+
+        // part 2
+        if(viewModel.showLocationDialog.value) {
+
+            AddUserLocationDataDialog(
+                showSaveLocation = false ,
+                onDismiss = { viewModel.showLocationDialog.value = false } ,
+                onSubmitClicked = { address , postalCode , _ ->
+
+                    viewModel.setUserLocation(address , postalCode)
+
+                }
+            )
+
+        }
+
     }
-    //part2
-
-    if(viewModel.showLocationDialog.value) {
-
-        AddUserLocationDataDialog(
-            showSaveLocation = false ,
-            onDismiss = { viewModel.showLocationDialog.value = false } ,
-            onSubmitClicked = { address , postalCode , _ ->
-
-                viewModel.setUserLocation(address , postalCode)
-
-            }
-        )
-
-    }
-
 
 }
-
 
 @Composable
 fun AddUserLocationDataDialog(
@@ -221,6 +221,7 @@ fun AddUserLocationDataDialog(
 }
 
 
+
 @Composable
 fun ShowDataSection(
     subject: String,
@@ -253,7 +254,6 @@ fun ShowDataSection(
 
 }
 
-
 @Composable
 fun MainAnimation() {
 
@@ -270,7 +270,6 @@ fun MainAnimation() {
     )
 
 }
-
 
 @Composable
 fun ProfileToolbar(
@@ -304,7 +303,6 @@ fun ProfileToolbar(
         }
 
     )
+
+
 }
-
-
-

@@ -23,11 +23,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
+import com.example.bagstore_14.R
 import com.example.bagstore_14.model.data.Ads
+import com.example.bagstore_14.model.data.CheckOut
 import com.example.bagstore_14.model.data.Product
 import com.example.bagstore_14.ui.theme.*
 import com.example.bagstore_14.util.*
@@ -39,7 +43,7 @@ import org.koin.core.parameter.parametersOf
 
 @Preview(showBackground = true)
 @Composable
-fun MainScreePreview() {
+fun MainScreenPreview() {
 
     MainAppTheme {
         Surface(
@@ -48,71 +52,194 @@ fun MainScreePreview() {
         ) {
             MainScreen()
         }
-    }
-}
 
+    }
+
+}
 
 @Composable
 fun MainScreen() {
+
     val context = LocalContext.current
+
     val uiController = rememberSystemUiController()
     SideEffect { uiController.setStatusBarColor(Color.White) }
+
     val viewModel =
         getNavViewModel<MainViewModel>(parameters = { parametersOf(NetworkChecker(context).isInternetConnected) })
     val navigation = getNavController()
 
-    if (NetworkChecker(context).isInternetConnected){
-
-
+    if (NetworkChecker(context).isInternetConnected) {
         viewModel.loadBadgeNumber()
     }
 
+    if (viewModel.getPaymentStatus() == PAYMENT_PENDING) {
+        if (NetworkChecker(context).isInternetConnected) {
+            viewModel.getCheckoutData()
+        }
+    }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(bottom = 16.dp)
+    Box {
 
-    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 16.dp)
+        ) {
 
-        if (viewModel.showProgressBar.value) {
+            if (viewModel.showProgressBar.value) {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = Blue
+                )
+            }
 
-            LinearProgressIndicator(
-                modifier = Modifier.fillMaxWidth(),
-                color = Blue
+            TopToolbar(
+                badgeNumber = viewModel.badgeNumber.value,
+                onCartClicked = {
 
+                    if (NetworkChecker(context).isInternetConnected)
+                        navigation.navigate(MyScreens.CartScreen.route)
+                    else
+                        Toast.makeText(
+                            context,
+                            "please connect to internet first...",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                },
+                onProfileClicked = {
+                    navigation.navigate(MyScreens.ProfileScreen.route)
+                })
+
+
+            CategoryBar(CATEGORY) {
+                navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
+            }
+
+            val productDataState = viewModel.dataProducts
+            val adsDataState = viewModel.dataAds
+            ProductSubjectList(TAGS, productDataState.value, adsDataState.value) {
+                navigation.navigate(MyScreens.ProductScreen.route + "/" + it)
+            }
+
+        }
+
+        if (viewModel.showPaymentResultDialog.value) {
+
+            PaymentResultDialog(
+                checkoutResult = viewModel.checkoutData.value,
+                onDismiss = {
+                    viewModel.showPaymentResultDialog.value = false
+                    viewModel.setPaymentStatus(NO_PAYMENT)
+                }
             )
-        }
-
-        TopToolbar(
-            badgeNumber = viewModel.badgeNumber.value,
-            onCardClicked = {
-                if(NetworkChecker(context).isInternetConnected)
-                navigation.navigate(MyScreens.CartScreen.route)
-                else
-                    Toast.makeText(context , "No Internet", Toast.LENGTH_SHORT).show()
-                            },
-            onProfileClicked = { navigation.navigate(MyScreens.ProfileScreen.route) })
-        CategoryBar(CATEGORY) {
-            navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
-        }
-
-        val productDataState = viewModel.dataProducts
-        val adsDataState = viewModel.dataAds
-
-        ProductSubjectList(TAGS, productDataState.value, adsDataState.value) {
-
-            navigation.navigate(MyScreens.ProductScreen.route + "/" + it)
 
         }
-
 
     }
 
 }
 
-//------------------------------------------------------------------------------
+@Composable
+private fun PaymentResultDialog(
+    checkoutResult: CheckOut,
+    onDismiss: () -> Unit
+) {
+
+    Dialog(onDismissRequest = onDismiss) {
+
+        Card(
+            elevation = 8.dp,
+            shape = Shapes.medium
+        ) {
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Text(
+                    text = "Payment Result",
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Main Data
+                if (checkoutResult.order?.status?.toInt() == PAYMENT_SUCCESS) {
+
+                    AsyncImage(
+                        model = R.drawable.success_anim,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(110.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(text = "Payment was successful!", style = TextStyle(fontSize = 16.sp))
+                    Text(
+                        text = "Purchase Amount: " + stylePrice(
+                            (checkoutResult.order!!.amount).substring(
+                                0,
+                                (checkoutResult.order!!.amount).length - 1
+                            )
+                        )
+                    )
+
+                } else {
+
+                    AsyncImage(
+                        model = R.drawable.fail_anim,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(110.dp)
+                            .padding(top = 6.dp, bottom = 6.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(text = "Payment was not successful!", style = TextStyle(fontSize = 16.sp))
+                    Text(
+                        text = "Purchase Amount: " + stylePrice(
+                            (checkoutResult.order!!.amount).substring(
+                                0,
+                                (checkoutResult.order.amount).length - 1
+                            )
+                        )
+                    )
+
+                }
+
+                // Ok Button
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+
+                    TextButton(onClick = onDismiss) {
+                        Text(text = "ok")
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                }
+            }
+        }
+    }
+}
+
+
+// -------------------------------------------------------------
+
 @Composable
 fun ProductSubjectList(
     tags: List<String>,
@@ -120,39 +247,47 @@ fun ProductSubjectList(
     ads: List<Ads>,
     onProductClicked: (String) -> Unit
 ) {
-    val content = LocalContext.current
+
     if (products.isNotEmpty()) {
+
         Column {
+
             tags.forEachIndexed { it, _ ->
+
                 val withTagData = products.filter { product -> product.tags == tags[it] }
                 ProductSubject(tags[it], withTagData.shuffled(), onProductClicked)
+
                 if (ads.size >= 2)
-                    if (it == 1 || it == 2) {
-                        BigPictureTablighat(ads[it - 1] , onProductClicked)
-                    }
+                    if (it == 1 || it == 2)
+                        BigPictureTablighat(ads[it - 1], onProductClicked)
+
             }
+
         }
+
     }
 
 }
 
-
 @Composable
-fun TopToolbar(badgeNumber: Int , onCardClicked: () -> Unit, onProfileClicked: () -> Unit) {
+fun TopToolbar(
+    badgeNumber: Int,
+    onCartClicked: () -> Unit,
+    onProfileClicked: () -> Unit
+) {
 
     TopAppBar(
         elevation = 0.dp,
         backgroundColor = Color.White,
-        title = { Text(text = "BagStore-14") },
+        title = { Text(text = "Duni Bazaar") },
         actions = {
 
             IconButton(
-                onClick = { onCardClicked.invoke() }) {
-
+                onClick = { onCartClicked.invoke() }
+            ) {
                 if (badgeNumber == 0) {
                     Icon(Icons.Default.ShoppingCart, null)
                 } else {
-
                     BadgedBox(badge = { Badge { Text(badgeNumber.toString()) } }) {
                         Icon(Icons.Default.ShoppingCart, null)
                     }
@@ -167,22 +302,23 @@ fun TopToolbar(badgeNumber: Int , onCardClicked: () -> Unit, onProfileClicked: (
         }
     )
 
-
 }
-//------------------------------------------------------------------------------
+
+// -------------------------------------------------------------
 
 @Composable
 fun CategoryBar(categoryList: List<Pair<String, Int>>, onCategoryClicked: (String) -> Unit) {
 
     LazyRow(
         modifier = Modifier.padding(top = 16.dp),
-        contentPadding = PaddingValues(end = 16.dp),
+        contentPadding = PaddingValues(end = 16.dp)
     ) {
+
         items(categoryList.size) {
             CategoryItem(categoryList[it], onCategoryClicked)
         }
-    }
 
+    }
 
 }
 
@@ -192,9 +328,7 @@ fun CategoryItem(subject: Pair<String, Int>, onCategoryClicked: (String) -> Unit
     Column(
         modifier = Modifier
             .padding(start = 16.dp)
-            .clickable {
-                onCategoryClicked.invoke(subject.first)
-            },
+            .clickable { onCategoryClicked.invoke(subject.first) },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -210,50 +344,57 @@ fun CategoryItem(subject: Pair<String, Int>, onCategoryClicked: (String) -> Unit
             )
 
         }
+
         Text(
             text = subject.first,
             modifier = Modifier.padding(top = 4.dp),
             style = TextStyle(color = Color.Gray)
         )
+
     }
 
 }
-//------------------------------------------------------------------------------
+
+
+// -------------------------------------------------------------
 
 @Composable
-fun ProductSubject(subject: String, data: List<Product> ,   onProductClicked: (String) -> Unit) {
+fun ProductSubject(subject: String, data: List<Product>, onProductClicked: (String) -> Unit) {
 
     Column(
-        modifier = Modifier.padding(top = 32.dp),
-
-        ) {
+        modifier = Modifier.padding(top = 32.dp)
+    ) {
 
         Text(
             text = subject,
             modifier = Modifier.padding(start = 16.dp),
             style = MaterialTheme.typography.h6
         )
-        ProductBar(data ,   onProductClicked)
+
+        ProductBar(data, onProductClicked)
 
     }
-
 
 }
 
 @Composable
-fun ProductBar(data: List<Product> ,  onProductClicked: (String) -> Unit) {
+fun ProductBar(data: List<Product>, onProductClicked: (String) -> Unit) {
+
     LazyRow(
         modifier = Modifier.padding(top = 16.dp),
         contentPadding = PaddingValues(end = 16.dp)
     ) {
         items(data.size) {
-            ProductItem(data[it] , onProductClicked)
+
+            ProductItem(data[it], onProductClicked)
+
         }
     }
+
 }
 
 @Composable
-fun ProductItem(product: Product ,  onProductClicked: (String) -> Unit) {
+fun ProductItem(product: Product, onProductClicked: (String) -> Unit) {
 
     Card(
         modifier = Modifier
@@ -291,7 +432,7 @@ fun ProductItem(product: Product ,  onProductClicked: (String) -> Unit) {
                 )
 
                 Text(
-                    text = product.soldItem + "Sold",
+                    text = product.soldItem + " Sold",
                     style = TextStyle(color = Color.Gray, fontSize = 13.sp)
                 )
 
@@ -300,11 +441,10 @@ fun ProductItem(product: Product ,  onProductClicked: (String) -> Unit) {
     }
 }
 
-//------------------------------------------------------------------------------
+// -------------------------------------------------------------
 
 @Composable
-fun BigPictureTablighat(ads: Ads ,  onProductClicked: (String) -> Unit) {
-
+fun BigPictureTablighat(ads: Ads, onProductClicked: (String) -> Unit) {
 
     AsyncImage(
         model = ads.imageURL,
@@ -318,6 +458,9 @@ fun BigPictureTablighat(ads: Ads ,  onProductClicked: (String) -> Unit) {
         contentScale = ContentScale.Crop
     )
 
-
 }
-//------------------------------------------------------------------------------
+
+// -------------------------------------------------------------
+
+
+

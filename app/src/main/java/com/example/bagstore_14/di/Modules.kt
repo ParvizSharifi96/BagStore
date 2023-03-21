@@ -13,6 +13,7 @@ import com.example.bagstore_14.model.repository.product.ProductRepositoryImpl
 import com.example.bagstore_14.model.repository.user.UserRepository
 import com.example.bagstore_14.model.repository.user.UserRepositoryImpl
 import com.example.bagstore_14.ui.features.SignUp.SignUpViewModel
+import com.example.bagstore_14.ui.features.cart.CartViewModel
 import com.example.bagstore_14.ui.features.category.CategoryViewModel
 import com.example.bagstore_14.ui.features.main.MainViewModel
 import com.example.bagstore_14.ui.features.product.ProductViewModel
@@ -23,6 +24,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val myModules = module {
+
     single { androidContext().getSharedPreferences("data", Context.MODE_PRIVATE) }
     single { createApiService() }
 
@@ -31,22 +33,15 @@ val myModules = module {
     }
 
     single<UserRepository> { UserRepositoryImpl(get(), get()) }
-    single<ProductRepository> {
-        ProductRepositoryImpl(
-            get(),
-            get<AppDatabase>().productDao(),
-
-            )
-    }
+    single<ProductRepository> { ProductRepositoryImpl(get(), get<AppDatabase>().productDao()) }
     single<CommentRepository> { CommentRepositoryImpl(get()) }
-    single<CartRepository> { CartRepositoryImpl(get()) }
+    single<CartRepository> { CartRepositoryImpl(get(), get()) }
 
-
+    viewModel { CategoryViewModel(get()) }
     viewModel { ProfileViewModel(get()) }
-    viewModel { ProductViewModel(get() , get(), get()) }
+    viewModel { ProductViewModel(get(), get(), get()) }
     viewModel { SignUpViewModel(get()) }
     viewModel { SignInViewModel(get()) }
-    viewModel { (isNetConnected: Boolean) -> MainViewModel(get(),get() , isNetConnected) }
-    viewModel { CategoryViewModel(get()) }
-
+    viewModel { (isNetConnected: Boolean) -> MainViewModel(get(), get(), isNetConnected) }
+    viewModel { CartViewModel(get(), get()) }
 }

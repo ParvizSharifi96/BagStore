@@ -5,12 +5,9 @@ import com.example.bagstore_14.model.data.Product
 
 interface ProductRepository {
 
-  suspend  fun getAllProducts(isInternetConnected : Boolean) : List<Product>
-    suspend fun getAllAds(isInternetConnected : Boolean) : List<Ads>
-    suspend fun getAllProductByCategory(category: String) : List<Product>
-    suspend fun getProductById(productId: String) : Product
-
-
-
+  suspend fun getAllProducts(isInternetConnected :Boolean): List<Product>
+  suspend fun getAllAds(isInternetConnected :Boolean): List<Ads>
+  suspend fun getAllProductsByCategory(category :String) :List<Product>
+  suspend fun getProductById(productId :String) :Product
 
 }

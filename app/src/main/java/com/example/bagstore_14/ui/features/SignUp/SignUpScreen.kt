@@ -40,99 +40,100 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Preview(showBackground = true)
 @Composable
-fun SingUpScreenPreview() {
+fun SignUpScreenPreview() {
+
     MainAppTheme {
         Surface(
-            color = BackgroundMain ,
+            color = BackgroundMain,
             modifier = Modifier.fillMaxSize()
         ) {
-            SingUpScreen()
+            SignUpScreen()
         }
     }
+
 }
 
 @Composable
-fun SingUpScreen() {
+fun SignUpScreen() {
     val uiController = rememberSystemUiController()
     SideEffect { uiController.setStatusBarColor(Blue) }
-    val context = LocalContext.current
 
+    val context = LocalContext.current
     val navigation = getNavController()
     val viewModel = getNavViewModel<SignUpViewModel>()
 
     clearInputs(viewModel)
 
-     Box {
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.4f)
-            .background(Blue)
+    Box {
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.4f)
+                .background(Blue)
         )
-         Column(
-             modifier = Modifier
-                 .fillMaxWidth()
-                 .fillMaxHeight(0.95f)
-                 .verticalScroll(rememberScrollState()),
-             verticalArrangement = Arrangement.SpaceEvenly,
-             horizontalAlignment = Alignment.CenterHorizontally
 
-         ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.95f)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.SpaceEvenly,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-             IconApp()
-             MainCardView(navigation,viewModel){
-                 viewModel.signUpUser{
-                     if (it == VALUE_SUCCESS){
+            IconApp()
 
+            MainCardView(navigation, viewModel) {
 
+                viewModel.signUpUser {
 
-                         navigation.navigate(MyScreens.MainScreen.route){
+                    if (it == VALUE_SUCCESS) {
 
-                             popUpTo(MyScreens.MainScreen.route){
-                                 inclusive= true
-                             }
+                        navigation.navigate(MyScreens.MainScreen.route) {
+                            popUpTo(MyScreens.MainScreen.route) {
+                                inclusive = true
+                            }
+                        }
 
-                         }
+                    } else {
+                        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                    }
 
-                     }else{
-                         Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-                     }
+                }
 
+            }
 
-                 }
-
-             }
-         }
-     }
-
+        }
+    }
 }
 
 @Composable
-fun IconApp(){
+fun IconApp() {
+
     Surface(
-      modifier = Modifier
-          .clip(CircleShape)
-          .size(64.dp)
+        modifier = Modifier
+            .clip(CircleShape)
+            .size(64.dp)
     ) {
+
         Image(
             modifier = Modifier.padding(14.dp),
-            painter = painterResource(id = R.drawable.ic_icon_app) ,
-            contentDescription =null )
+            painter = painterResource(id = R.drawable.ic_icon_app),
+            contentDescription = null
+        )
 
     }
 
-
 }
 
 @Composable
-fun MainCardView(navigation:NavController, viewModel: SignUpViewModel ,SignUpEvent:()->Unit){
-
+fun MainCardView(navigation: NavController, viewModel: SignUpViewModel, SignUpEvent: () -> Unit) {
     val name = viewModel.name.observeAsState("")
     val email = viewModel.email.observeAsState("")
-    val password= viewModel.password.observeAsState("")
-    val confirmPassword= viewModel.confirmPassword.observeAsState("")
-
+    val password = viewModel.password.observeAsState("")
+    val confirmPassword = viewModel.confirmPassword.observeAsState("")
     val context = LocalContext.current
-
 
     Card(
         modifier = Modifier
@@ -141,44 +142,68 @@ fun MainCardView(navigation:NavController, viewModel: SignUpViewModel ,SignUpEve
         elevation = 10.dp,
         shape = Shapes.medium
     ) {
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             Text(
                 modifier = Modifier.padding(top = 18.dp, bottom = 18.dp),
                 text = "Sign Up",
                 style = TextStyle(color = Blue, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             )
-            MainTextField(name.value,R.drawable.ic_person , "Your Full Name"){viewModel.name.value = it}
-            MainTextField(email.value,R.drawable.ic_email , "Email"){viewModel.email.value = it}
-            PasswordTextField(password.value,R.drawable.ic_password , "Password"){viewModel.password.value = it}
-            PasswordTextField(confirmPassword.value,R.drawable.ic_password , "Confirm Password"){viewModel.confirmPassword.value = it}
 
+            MainTextField(
+                name.value,
+                R.drawable.ic_person,
+                "Your Full Name"
+            ) { viewModel.name.value = it }
+            MainTextField(email.value, R.drawable.ic_email, "Email") { viewModel.email.value = it }
+            PasswordTextField(
+                password.value,
+                R.drawable.ic_password,
+                "Password"
+            ) { viewModel.password.value = it }
+            PasswordTextField(
+                confirmPassword.value,
+                R.drawable.ic_password,
+                "Confirm Password"
+            ) { viewModel.confirmPassword.value = it }
             Button(onClick = {
-                             if (name.value.isNotEmpty() && email.value.isNotEmpty() && password.value.isNotEmpty() && confirmPassword.value.isNotEmpty() ){
-
-                                 if(password.value == confirmPassword.value){
-                                     if (password.value.length>=8){
-                                         if (Patterns.EMAIL_ADDRESS.matcher(email.value).matches()){
-                                             if (NetworkChecker(context).isInternetConnected){
-                                                 SignUpEvent.invoke()
-                                             }else{
-                                                 Toast.makeText(context, "Please connect to internet ", Toast.LENGTH_SHORT).show()
-                                             }
-
-                                         }else{
-                                             Toast.makeText(context, "Email format is not true ", Toast.LENGTH_SHORT).show()
-                                         }
-                                     }else{
-                                         Toast.makeText(context, "Password characters should be more than 8 ! ", Toast.LENGTH_SHORT).show()
-                                     }
-                                 }else{
-                                     Toast.makeText(context, "Passwords are not the same! ", Toast.LENGTH_SHORT).show()
-                                 }
-                             }else{ Toast.makeText(context, "Please write data first", Toast.LENGTH_SHORT).show() }
-
-
-
+                if (name.value.isNotEmpty() && email.value.isNotEmpty() && password.value.isNotEmpty() && confirmPassword.value.isNotEmpty()) {
+                    if (password.value == confirmPassword.value) {
+                        if (password.value.length >= 8) {
+                            if (Patterns.EMAIL_ADDRESS.matcher(email.value).matches()) {
+                                if (NetworkChecker(context).isInternetConnected) {
+                                    SignUpEvent.invoke()
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "please connect to internet",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "email format is not true",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "password characters should be more than 8!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } else {
+                        Toast.makeText(context, "passwords are not the same!", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                } else {
+                    Toast.makeText(context, "please write data first...", Toast.LENGTH_SHORT).show()
+                }
             }, modifier = Modifier.padding(top = 28.dp, bottom = 8.dp)) {
                 Text(
                     modifier = Modifier.padding(8.dp),
@@ -186,93 +211,89 @@ fun MainCardView(navigation:NavController, viewModel: SignUpViewModel ,SignUpEve
                 )
             }
 
-            Row(modifier = Modifier.padding(bottom = 18.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically){
-                Text("Already have an account?")
+            Row(
+                modifier = Modifier.padding(bottom = 18.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Text("Already have  an account?")
                 Spacer(modifier = Modifier.width(8.dp))
-                TextButton(onClick ={
-                    navigation.navigate(MyScreens.SignInScreen.route){
+                TextButton(onClick = {
 
-                popUpTo(MyScreens.SignUpScreen.route){
-                    inclusive = true
-                }
+                    navigation.navigate(MyScreens.SignInScreen.route) {
+                        popUpTo(MyScreens.SignUpScreen.route) {
+                            inclusive = true
+                        }
+                    }
 
-                } } ) {
-                    Text("Log In" , color = Blue)
-                    
-                }
+                }) { Text("Log In", color = Blue) }
+
             }
+
+
         }
+
     }
 
 
 }
 
 @Composable
-fun MainTextField(
-    edtValue:String,
-    icon:Int,
-    hint:String,
-    onValueChanges:(String) ->Unit
-){
+fun MainTextField(edtValue: String, icon: Int, hint: String, onValueChanges: (String) -> Unit) {
+
     OutlinedTextField(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-        label = { Text(hint)},
-    value = edtValue,
+        label = { Text(hint) },
+        value = edtValue,
         singleLine = true,
         onValueChange = onValueChanges,
-        placeholder = { Text(hint)},
+        placeholder = { Text(hint) },
         modifier = Modifier
             .fillMaxWidth(0.9f)
             .padding(top = 12.dp),
         shape = Shapes.medium,
-        leadingIcon = { Icon(painterResource(icon),null)}
-
-        )
-
+        leadingIcon = { Icon(painterResource(icon), null) }
+    )
 
 }
 
 @Composable
-fun PasswordTextField(edtValue:String, icon:Int, hint:String, onValueChanges:(String) ->Unit){
-
+fun PasswordTextField(edtValue: String, icon: Int, hint: String, onValueChanges: (String) -> Unit) {
     val passwordVisible = remember { mutableStateOf(false) }
 
-
     OutlinedTextField(
-        label = { Text(hint)},
+        label = { Text(hint) },
         value = edtValue,
         singleLine = true,
         onValueChange = onValueChanges,
-        placeholder = { Text(hint)},
+        placeholder = { Text(hint) },
         modifier = Modifier
             .fillMaxWidth(0.9f)
             .padding(top = 12.dp),
         shape = Shapes.medium,
-        leadingIcon = { Icon(painterResource(icon),null)},
+        leadingIcon = { Icon(painterResource(icon), null) },
         visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         trailingIcon = {
-            
-            val image = if (passwordVisible.value) painterResource(id = R.drawable.ic_visible) else
-                painterResource(R.drawable.ic_invisible)
 
-            Icon(painter = image, contentDescription = null,
-            modifier = Modifier.clickable { passwordVisible.value= !passwordVisible.value })
-            
+            val image = if (passwordVisible.value) painterResource(R.drawable.ic_visible)
+            else painterResource(R.drawable.ic_invisible)
+
+            Icon(
+                painter = image,
+                contentDescription = null,
+                modifier = Modifier.clickable { passwordVisible.value = !passwordVisible.value }
+            )
+
         }
-
-
     )
-
 
 }
 
-fun clearInputs(viewModel: SignUpViewModel){
-    viewModel.email.value =""
-    viewModel.name.value =""
-    viewModel.password.value =""
-    viewModel.confirmPassword.value =""
-
+fun clearInputs(viewModel: SignUpViewModel) {
+    viewModel.email.value = ""
+    viewModel.name.value = ""
+    viewModel.password.value = ""
+    viewModel.confirmPassword.value = ""
 }

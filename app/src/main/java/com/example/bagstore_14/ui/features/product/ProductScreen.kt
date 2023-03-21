@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalConfiguration
@@ -54,7 +55,8 @@ fun ProductScreenPreview() {
 
     MainAppTheme {
         Surface(
-            modifier = Modifier.fillMaxSize(), color = BackgroundMain
+            modifier = Modifier.fillMaxSize(),
+            color = BackgroundMain
         ) {
             ProductScreen("")
         }
@@ -67,12 +69,15 @@ fun ProductScreenPreview() {
 fun ProductScreen(productId: String) {
 
     val context = LocalContext.current
+
     val viewModel = getNavViewModel<ProductViewModel>()
     viewModel.loadData(productId, NetworkChecker(context).isInternetConnected)
+
     val navigation = getNavController()
 
     Box(
-        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomCenter
     ) {
 
         Column(
@@ -86,68 +91,82 @@ fun ProductScreen(productId: String) {
                 productName = "Details",
                 badgeNumber = viewModel.badgeNumber.value,
                 OnBackClicked = {
-                navigation.popBackStack()
-            }, OnCartClicked = {
+                    navigation.popBackStack()
+                },
+                OnCartClicked = {
 
-                if (NetworkChecker(context).isInternetConnected) {
-                    navigation.navigate(MyScreens.CartScreen.route)
-                } else {
-                    Toast.makeText(context, "Please connect to internet", Toast.LENGTH_SHORT).show()
-
+                    if (NetworkChecker(context).isInternetConnected) {
+                        navigation.navigate(MyScreens.CartScreen.route)
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "please connect to internet first...",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-            })
+            )
 
-            val comments = if (NetworkChecker(context).isInternetConnected) viewModel.comments.value else listOf()
-            ProductItem(data = viewModel.thisProduct.value,
+            val comments =
+                if (NetworkChecker(context).isInternetConnected) viewModel.comments.value else listOf()
+            ProductItem(
+                data = viewModel.thisProduct.value,
                 comments = comments,
-                onCategoryClicked = {
+                OnCategoryClicked = {
                     navigation.navigate(MyScreens.CategoryScreen.route + "/" + it)
-                }, OnAddNewComment = {
+                },
+                OnAddNewComment = {
 
-                    viewModel.addNewComment(productId , it){payam ->
+                    viewModel.addNewComment(productId, it) { payam ->
                         Toast.makeText(context, payam, Toast.LENGTH_SHORT).show()
                     }
 
-
-
                 }
-
             )
 
         }
-        AddToCart(viewModel.thisProduct.value.price ,
-            viewModel.isAddingProduct.value){
-            if(NetworkChecker(context).isInternetConnected){
-                viewModel.addProductToCart(productId ){
+
+        AddToCart(
+            viewModel.thisProduct.value.price,
+            viewModel.isAddingProduct.value
+        ) {
+
+            if (NetworkChecker(context).isInternetConnected) {
+                viewModel.addProductToCart(productId) {
                     Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                 }
 
-                
-            }else{
-
-                Toast.makeText(context, "Please connect to internet", Toast.LENGTH_SHORT).show()
-                
-                
+            } else {
+                Toast.makeText(context, "please connect to internet...", Toast.LENGTH_SHORT).show()
             }
 
-
         }
+
     }
+
+
 }
 
 @Composable
-fun ProductItem(data: Product, comments: List<Comment>, onCategoryClicked: (String) -> Unit
-,OnAddNewComment: (String) -> Unit) {
+fun ProductItem(
+    data: Product,
+    comments: List<Comment>,
+    OnCategoryClicked: (String) -> Unit,
+    OnAddNewComment: (String) -> Unit
+) {
+
     Column(
         modifier = Modifier.padding(16.dp)
     ) {
-        ProductDesign(data, onCategoryClicked)
+
+        ProductDesign(data, OnCategoryClicked)
 
         Divider(
             color = Color.LightGray,
             thickness = 1.dp,
             modifier = Modifier.padding(top = 14.dp, bottom = 14.dp)
         )
+
         ProductDetail(data, comments.size.toString())
 
         Divider(
@@ -156,21 +175,21 @@ fun ProductItem(data: Product, comments: List<Comment>, onCategoryClicked: (Stri
             modifier = Modifier.padding(top = 14.dp, bottom = 4.dp)
         )
 
-        ProductComments(comments , OnAddNewComment)
-
+        ProductComments(comments, OnAddNewComment)
 
     }
-
 
 }
 
 @Composable
 fun CommentBody(comment: Comment) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp),
         elevation = 0.dp,
+        border = BorderStroke(1.dp, Color.LightGray),
         shape = Shapes.large
     ) {
 
@@ -185,39 +204,38 @@ fun CommentBody(comment: Comment) {
             Text(
                 modifier = Modifier.padding(top = 10.dp),
                 text = comment.text,
-                style = TextStyle(fontSize = 13.sp),
-
-                )
+                style = TextStyle(fontSize = 14.sp)
+            )
 
         }
 
-
-        Divider(
-            color = Color.LightGray,
-            thickness = 1.dp,
-            modifier = Modifier.padding(top = 2.dp, bottom = 8.dp)
-        )
     }
 
 }
 
-
 @Composable
-fun ProductComments(comments: List<Comment>, AddNewComment: (String) -> Unit) {
+fun ProductComments(
+    comments: List<Comment>,
+    AddNewComment: (String) -> Unit
+) {
 
     val showCommentDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     if (comments.isNotEmpty()) {
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
 
+
             Text(
-                text = "Comments", style = TextStyle(
-                    fontSize = 20.sp, fontWeight = FontWeight.Medium
+                text = "Comments",
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium
                 )
             )
 
@@ -227,16 +245,20 @@ fun ProductComments(comments: List<Comment>, AddNewComment: (String) -> Unit) {
                     showCommentDialog.value = true
                 } else {
 
-                    Toast.makeText(context, "Please Connect to internet", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "connect to internet to add comment...",
+                        Toast.LENGTH_SHORT
+                    ).show()
 
                 }
-            }) {
 
+            }) {
                 Text(
-                    text = "Add New Comment", style = TextStyle(fontSize = 14.sp)
+                    text = "Add New Comment",
+                    style = TextStyle(fontSize = 14.sp)
                 )
             }
-
         }
 
         comments.forEach {
@@ -245,52 +267,55 @@ fun ProductComments(comments: List<Comment>, AddNewComment: (String) -> Unit) {
 
     } else {
 
-
         TextButton(onClick = {
-
             if (NetworkChecker(context).isInternetConnected) {
                 showCommentDialog.value = true
             } else {
-                Toast.makeText(
-                    context, "Please connect to internet to add comment ", Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(context, "connect to internet to add comment...", Toast.LENGTH_SHORT)
+                    .show()
             }
-
-
         }) {
+
             Text(
-                text = "Add New Comment", style = TextStyle(fontSize = 13.sp)
+                text = "Add New Comment",
+                style = TextStyle(fontSize = 13.sp)
             )
 
         }
-    }
 
+    }
 
     if (showCommentDialog.value) {
-        AddNewCommentDialog(
 
-            OnDismiss = { showCommentDialog.value = false }, OnPositiveClick = {
+        AddNewCommentDialog(
+            OnDismiss = { showCommentDialog.value = false },
+            OnPositiveClick = {
                 AddNewComment.invoke(it)
             }
-
         )
 
-
     }
-
 
 }
 
 @Composable
 fun AddNewCommentDialog(
-    OnDismiss: () -> Unit, OnPositiveClick: (String) -> Unit
+    OnDismiss: () -> Unit,
+    OnPositiveClick: (String) -> Unit
 ) {
+
     val context = LocalContext.current
     val userComment = remember { mutableStateOf("") }
+
     Dialog(onDismissRequest = OnDismiss) {
+
         Card(
-            modifier = Modifier.fillMaxHeight(0.52f), elevation = 8.dp, shape = Shapes.medium
+            modifier = Modifier.fillMaxHeight(0.53f),
+            elevation = 8.dp,
+            shape = Shapes.medium
         ) {
+
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -298,7 +323,6 @@ fun AddNewCommentDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-
 
                 Text(
                     text = "Write Your Comment",
@@ -308,25 +332,28 @@ fun AddNewCommentDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
-
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+                // enter data =>
                 MainTextField(
-                    edtValue = userComment.value, hint = "Write Your Comment ..."
+                    edtValue = userComment.value,
+                    hint = "write something..."
                 ) {
                     userComment.value = it
                 }
 
                 // Buttons =>
-
                 Row(
-                    horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
+
                     TextButton(onClick = { OnDismiss.invoke() }) {
                         Text(text = "Cancel")
                     }
+
                     Spacer(modifier = Modifier.width(4.dp))
 
                     TextButton(onClick = {
@@ -337,30 +364,24 @@ fun AddNewCommentDialog(
                                 OnDismiss.invoke()
                             } else {
                                 Toast.makeText(
-                                    context, "Please connect to internet", Toast.LENGTH_SHORT
+                                    context,
+                                    "connect to internet first...",
+                                    Toast.LENGTH_SHORT
                                 ).show()
-
                             }
-
                         } else {
-                            Toast.makeText(context, "Please Enter Your Comment", Toast.LENGTH_SHORT)
+                            Toast.makeText(context, "please write  first...", Toast.LENGTH_SHORT)
                                 .show()
                         }
+
                     }) {
                         Text(text = "Ok")
                     }
                 }
-
-
             }
-
-
         }
-
     }
-
 }
-
 
 @Composable
 fun MainTextField(edtValue: String, hint: String, OnValueChanges: (String) -> Unit) {
@@ -371,30 +392,34 @@ fun MainTextField(edtValue: String, hint: String, OnValueChanges: (String) -> Un
         singleLine = false,
         maxLines = 2,
         onValueChange = OnValueChanges,
-        placeholder = { Text(text = "Write Your Comment ...") },
+        placeholder = { Text(text = "Write Something...") },
         modifier = Modifier.fillMaxWidth(0.9f),
         shape = Shapes.medium
     )
-}
 
+}
 
 @Composable
 fun ProductDetail(data: Product, commentNumber: String) {
-
     val context = LocalContext.current
+
     Row(
-        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
 
         Column {
+
             Row(verticalAlignment = Alignment.CenterVertically) {
+
                 Image(
                     painter = painterResource(id = R.drawable.ic_details_comment),
                     contentDescription = null,
                     modifier = Modifier.size(26.dp)
                 )
 
-                val commentText = if (NetworkChecker(context).isInternetConnected)"$commentNumber comments" else "No Internet"
+                val commentText =
+                    if (NetworkChecker(context).isInternetConnected) commentNumber + " Comments" else "No Internet"
                 Text(
                     text = commentText,
                     modifier = Modifier.padding(start = 6.dp),
@@ -407,6 +432,7 @@ fun ProductDetail(data: Product, commentNumber: String) {
                 modifier = Modifier.padding(top = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Image(
                     painter = painterResource(id = R.drawable.ic_details_material),
                     contentDescription = null,
@@ -425,6 +451,7 @@ fun ProductDetail(data: Product, commentNumber: String) {
                 modifier = Modifier.padding(top = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Image(
                     painter = painterResource(id = R.drawable.ic_details_sold),
                     contentDescription = null,
@@ -432,20 +459,21 @@ fun ProductDetail(data: Product, commentNumber: String) {
                 )
 
                 Text(
-                    text = data.soldItem + " sold",
+                    text = data.soldItem + " Sold",
                     modifier = Modifier.padding(start = 6.dp),
                     fontSize = 13.sp
                 )
 
             }
+
         }
 
         Surface(
             modifier = Modifier
                 .clip(Shapes.large)
-                .align(Alignment.Bottom), color = Color.Blue
+                .align(Alignment.Bottom),
+            color = Blue
         ) {
-
             Text(
                 text = data.tags,
                 color = Color.White,
@@ -456,11 +484,12 @@ fun ProductDetail(data: Product, commentNumber: String) {
 
     }
 
-
 }
 
+
 @Composable
-fun ProductDesign(data: Product, onCategoryClicked: (String) -> Unit) {
+fun ProductDesign(data: Product, OnCategoryClicked: (String) -> Unit) {
+
     AsyncImage(
         model = data.imgUrl,
         contentDescription = null,
@@ -469,11 +498,14 @@ fun ProductDesign(data: Product, onCategoryClicked: (String) -> Unit) {
             .fillMaxWidth()
             .height(200.dp)
             .clip(Shapes.medium)
-
     )
+
     Text(
-        modifier = Modifier.padding(top = 14.dp), text = data.name, style = TextStyle(
-            fontSize = 20.sp, fontWeight = FontWeight.Medium
+        modifier = Modifier.padding(top = 14.dp),
+        text = data.name,
+        style = TextStyle(
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Medium
         )
     )
 
@@ -483,28 +515,34 @@ fun ProductDesign(data: Product, onCategoryClicked: (String) -> Unit) {
         style = TextStyle(fontSize = 15.sp, textAlign = TextAlign.Justify)
     )
 
-    TextButton(onClick = { onCategoryClicked.invoke(data.category) }) {
+    TextButton(onClick = { OnCategoryClicked.invoke(data.category) }) {
+
         Text(
-            text = "#" + data.category, style = TextStyle(fontSize = 13.sp)
+            text = "#" + data.category,
+            style = TextStyle(fontSize = 13.sp)
         )
 
     }
 
 }
 
-
 @Composable
 fun ProductToolbar(
-    productName: String, badgeNumber: Int, OnBackClicked: () -> Unit, OnCartClicked: () -> Unit
+    productName: String,
+    badgeNumber: Int,
+    OnBackClicked: () -> Unit,
+    OnCartClicked: () -> Unit
 ) {
 
-    TopAppBar(navigationIcon = {
-        IconButton(onClick = { OnBackClicked.invoke() }) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack, contentDescription = null
-            )
-        }
-    },
+    TopAppBar(
+        navigationIcon = {
+            IconButton(onClick = { OnBackClicked.invoke() }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = null
+                )
+            }
+        },
         elevation = 2.dp,
         backgroundColor = Color.White,
         modifier = Modifier.fillMaxWidth(),
@@ -520,8 +558,10 @@ fun ProductToolbar(
         },
         actions = {
 
-            IconButton(modifier = Modifier.padding(end = 6.dp),
-                onClick = { OnCartClicked.invoke() }) {
+            IconButton(
+                modifier = Modifier.padding(end = 6.dp),
+                onClick = { OnCartClicked.invoke() }
+            ) {
 
                 if (badgeNumber == 0) {
                     Icon(Icons.Default.ShoppingCart, null)
@@ -532,18 +572,21 @@ fun ProductToolbar(
                     }
                 }
             }
-        })
+        }
+    )
 }
 
 @Composable
 fun AddToCart(
-    price : String ,
-    isAddingProduct : Boolean ,
+    price: String,
+    isAddingProduct: Boolean,
     OnCartClicked: () -> Unit
 ) {
+
     val configuration = LocalConfiguration.current
     val fraction =
         if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 0.15f else 0.08f
+
     Surface(
         color = Color.White,
         modifier = Modifier
@@ -605,6 +648,8 @@ fun AddToCart(
         }
 
     }
+
+
 }
 
 @Composable
@@ -661,5 +706,5 @@ fun DotsTyping() {
         Spacer(Modifier.width(spaceSize))
         Dot(offset3)
     }
-
 }
+

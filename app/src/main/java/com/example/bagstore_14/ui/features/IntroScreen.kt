@@ -27,15 +27,12 @@ import dev.burnoo.cokoin.navigation.getNavController
 @Composable
 fun IntroScreenPreview() {
     MainAppTheme {
-
         Surface(
             color = BackgroundMain,
             modifier = Modifier.fillMaxSize()
         ) {
             IntroScreen()
         }
-
-
     }
 }
 
@@ -48,7 +45,8 @@ fun IntroScreen() {
 
     Image(
         modifier = Modifier.fillMaxSize(),
-        painter = painterResource(R.drawable.img_intro), contentDescription = null,
+        painter = painterResource(R.drawable.img_intro),
+        contentDescription = null,
         contentScale = ContentScale.Crop
     )
 
@@ -86,6 +84,5 @@ fun IntroScreen() {
         }
 
     }
-
 
 }

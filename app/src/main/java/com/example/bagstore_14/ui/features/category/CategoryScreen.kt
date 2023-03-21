@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -27,9 +28,9 @@ import dev.burnoo.cokoin.navigation.getNavViewModel
 
 @Composable
 fun CategoryScreen(categoryName: String) {
+
     val viewModel = getNavViewModel<CategoryViewModel>()
     viewModel.loadDataByCategory(categoryName)
-
 
     val navigation = getNavController()
 
@@ -38,11 +39,14 @@ fun CategoryScreen(categoryName: String) {
     ) {
 
         CategoryToolbar(categoryName)
+
         val data = viewModel.dataProducts
         CategoryList(data.value) {
             navigation.navigate(MyScreens.ProductScreen.route + "/" + it)
         }
+
     }
+
 
 }
 
@@ -57,7 +61,9 @@ fun CategoryItem(data: Product, onProductClicked: (String) -> Unit) {
         elevation = 4.dp,
         shape = Shapes.large
     ) {
+
         Column {
+
             AsyncImage(
                 model = data.imgUrl,
                 contentDescription = null,
@@ -71,6 +77,7 @@ fun CategoryItem(data: Product, onProductClicked: (String) -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
+
                 Column(
                     modifier = Modifier.padding(10.dp)
                 ) {
@@ -85,7 +92,7 @@ fun CategoryItem(data: Product, onProductClicked: (String) -> Unit) {
 
                     Text(
                         modifier = Modifier.padding(top = 4.dp),
-                        text = data.price + "Tomans",
+                        text = data.price + " Tomans",
                         style = TextStyle(fontSize = 14.sp)
                     )
 
@@ -96,37 +103,43 @@ fun CategoryItem(data: Product, onProductClicked: (String) -> Unit) {
                         .padding(bottom = 8.dp, end = 8.dp)
                         .align(Alignment.Bottom)
                         .clip(Shapes.large),
-                    color = Color.Blue
+                    color = Blue
                 ) {
+
                     Text(
                         modifier = Modifier.padding(4.dp),
-                        text = data.soldItem + "Sold",
+                        text = data.soldItem + " Sold",
                         style = TextStyle(
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color.White
                         )
                     )
+
                 }
+
+
             }
+
         }
+
+
     }
 
-
 }
-
 
 @Composable
 fun CategoryList(data: List<Product>, onProductClicked: (String) -> Unit) {
 
+    LazyColumn(modifier = Modifier.fillMaxSize() ,
+        contentPadding = PaddingValues(bottom = 16.dp)) {
 
-    LazyColumn(modifier = Modifier.fillMaxSize(),
-    contentPadding = PaddingValues(bottom = 16.dp)
-    ){
-        items(data.size){
+        items(data.size) {
             CategoryItem(data[it], onProductClicked)
         }
+
     }
+
 
 }
 
@@ -139,14 +152,15 @@ fun CategoryToolbar(categoryName: String) {
         backgroundColor = Color.White,
         modifier = Modifier.fillMaxWidth(),
         title = {
-         Text(
-             modifier = Modifier.fillMaxWidth(),
-             text = categoryName,
-             textAlign = TextAlign.Center,
-             )
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = categoryName,
+                textAlign = TextAlign.Center
+
+            )
+
         }
     )
-
-
 
 }
