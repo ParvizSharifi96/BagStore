@@ -279,7 +279,7 @@ fun TopToolbar(
     TopAppBar(
         elevation = 0.dp,
         backgroundColor = Color.White,
-        title = { Text(text = "Duni Bazaar") },
+        title = { Text(text = "BagStore-14") },
         actions = {
 
             IconButton(
